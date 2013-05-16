@@ -14,30 +14,38 @@ GENHAM::GENHAM(const int Ns, const long double J_, const long double h_, vector 
   LowField = Field;
   Mag = mag_;
 
-  // If using the highfield expansion then there are Ns bonds
+  // If using the highfield expansion then there are Ns sites
+  // ConnectCount stores the number of connections per site
   if( !LowField ) ConnectCount.resize(Ns, 0);
+
   // For LowField ....
   else{
     int max = 0;
+
     //loop through all the bonds.
     for (unsigned int CurrentBond = 0; CurrentBond < BBond_.size(); CurrentBond++)
     {
       //if the first site of the current bond is greater than max: set max equal to that, otherwise leave max at the same value;
       max = (BBond_[CurrentBond].first > max) ? BBond_[CurrentBond].first : max;
+
       //same deal for the second site of the bonds
       max = (BBond_[CurrentBond].second > max) ? BBond_[CurrentBond].second : max;
     }
-    //Set the number of bonds equal to the number of sites + 1 ?
+
+    //there are max+1 sites?
     ConnectCount.resize(max + 1, 0);
     Nsite = max + 1;
   }
 
+
+  //ConnectCount counts the number of connections for each site
   for (unsigned int CurrentBond = 0; CurrentBond < Bond.size(); CurrentBond++)
   {
     ConnectCount[Bond[CurrentBond].first]++;
     ConnectCount[Bond[CurrentBond].second]++;
   }
 
+  //Calculates the total dimension of the Hilbert space for Nsite spins
   Dim = 2;  //  S=1/2 models : two states
   for (int ch = 1; ch < Nsite; ch++) Dim *= 2;
 
