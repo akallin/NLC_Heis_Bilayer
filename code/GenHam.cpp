@@ -46,14 +46,16 @@ GENHAM::GENHAM(const int Ns, const long double J_, const long double h_, vector 
   }
 
   //Calculates the total dimension of the Hilbert space for Nsite spins
+  //** Gound to need to double Nsite for the bilayer
   Dim = 2;  //  S=1/2 models : two states
   for (int ch = 1; ch < Nsite; ch++) Dim *= 2;
 
   BasPos.resize(Dim, -1); //initialization 
   Basis.resize(Dim);
   Vdim=0;
-  unsigned long temp;    //create basis (16 site cluster)
+  unsigned long temp;    //create basis
 
+  //
   for (unsigned int i1 = 0; i1 < Dim; i1++) 
   {
       temp = 0;
