@@ -1,35 +1,39 @@
 #include "GenHam.h"
 
 //----------------------------------------------------------
-GENHAM::GENHAM(const int Ns, const h_float J_, const h_float J2_, const h_float Q_, const int Sz)  
-               : JJ(J_), J2(J2_), QQ(Q_) 
+GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vector <pair<int,int> > BBond_)   
 //create bases and determine dim of full Hilbert space
 {
-  int Dim;
+  JJ = J_;
+  JJ2 = J2_;
+  Bond = BBond_;
+  
+  unsigned int Dim;
   Nsite = Ns;
 
   Dim = 2;  //  S=1/2 models : two states
-  for (int ch=1; ch<Nsite; ch++) Dim *=2;
+  // Multiplied Nsite by 2 for the bilayer
+  for (int ch=1; ch<2*Nsite; ch++) Dim *=2;
   Fdim = Dim;
 
+  //BasPos holds the position of state x (in the vector Basis) in its x^th element
   BasPos.resize(Dim,-1); //initialization 
-
   Vdim=0;
-  unsigned long temp;    //create basis (16 site cluster)
+  unsigned long temp;    //create basis
 
   for (unsigned long i1=0; i1<Dim; i1++) 
   {
       temp = 0;
       for (int sp =0; sp<Nsite; sp++)
-          temp += (i1>>sp)&1;  //unpack bra
-      if (temp==(Nsite/2+Sz) ){ 
+          temp += (i1>>sp)&1;  //unpack bra & count the up spins
+      if (temp==(Nsite/2) ){ 
           Basis.push_back(i1);
           BasPos.at(i1)=Basis.size()-1;
           Vdim++;
       }
   }//Dim
 
-  cout<<"Vdim "<<Vdim<<" "<<Dim<<endl;
+  //  cout<<"Vdim "<<Vdim<<" "<<Dim<<endl;
 
 }//constructor
 
@@ -117,7 +121,7 @@ void GENHAM::SparseHamJQ()
   int Rsize;
   vector<long> tempBas;
   //vector<long> tempBas2;
-  vector<h_float> tempH;
+  vector<long double> tempH;
   unsigned long tempi, tempj, tempod;
   int si, sj,sk,sl;
   double tempD;

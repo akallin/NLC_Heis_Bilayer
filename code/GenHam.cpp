@@ -55,12 +55,13 @@ GENHAM::GENHAM(const int Ns, const long double J_, const long double h_, vector 
   Vdim=0;
   unsigned long temp;    //create basis
 
-  //
+  // this is the *Full* Sz basis.  For Heisenberg groundstate we only need Sz = 0 sector
   for (unsigned int i1 = 0; i1 < Dim; i1++) 
   {
       temp = 0;
       for (int sp = 0; sp < Nsite; sp++){ temp += (i1>>sp)&1; } //unpack bra
       Basis[ i1 ] = i1;
+      // The i1th basis state is labeled i1 (this will change for Sz=0 only basis)
       BasPos.at( i1 ) = i1;
       Vdim++;
   }//Dim

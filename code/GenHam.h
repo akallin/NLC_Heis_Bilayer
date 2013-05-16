@@ -22,7 +22,7 @@ public:
   
     vector< vector< double > > Ham;
   
-  GENHAM(const int N_ ,const long double J_, const long double h_, vector < pair<int,int> > BBond_, bool Low_, double mag_); 
+  GENHAM(const int N_ ,const long double J_, const long double Jh_, vector < pair<int,int> > BBond_, bool Low_, double mag_); 
     void printg();
     vector< double > apply( const vector< double > & );
   
@@ -36,6 +36,7 @@ private:
 
     long double JJ; //heisenberg exchange value
     long double hh; //next-nearest neighbor exchange value
+  long double JJ2; // J2 value (for heis bilayer)
   double Mag;
   
     double HdiagPart(const long, int);
