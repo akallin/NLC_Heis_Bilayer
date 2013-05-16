@@ -7,20 +7,27 @@ GENHAM::GENHAM(const int Ns, const long double J_, const long double h_, vector 
 
   hh = h_;
   JJ = J_;
+  //the adjacency list read in from the graph file(s) (See main cpp file)
   Bond = BBond_;
   unsigned int Dim;
   Nsite = Ns;
   LowField = Field;
   Mag = mag_;
 
+  // If using the highfield expansion then there are Ns bonds
   if( !LowField ) ConnectCount.resize(Ns, 0);
+  // For LowField ....
   else{
     int max = 0;
+    //loop through all the bonds.
     for (unsigned int CurrentBond = 0; CurrentBond < BBond_.size(); CurrentBond++)
     {
-        max = (BBond_[CurrentBond].first > max) ? BBond_[CurrentBond].first : max;
-        max = (BBond_[CurrentBond].second > max) ? BBond_[CurrentBond].second : max;
+      //if the first site of the current bond is greater than max: set max equal to that, otherwise leave max at the same value;
+      max = (BBond_[CurrentBond].first > max) ? BBond_[CurrentBond].first : max;
+      //same deal for the second site of the bonds
+      max = (BBond_[CurrentBond].second > max) ? BBond_[CurrentBond].second : max;
     }
+    //Set the number of bonds equal to the number of sites + 1 ?
     ConnectCount.resize(max + 1, 0);
     Nsite = max + 1;
   }
