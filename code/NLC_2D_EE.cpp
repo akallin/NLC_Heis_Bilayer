@@ -1,4 +1,6 @@
 /*******************************************************************
+NLCE for the Heisenberg Bilayer!
+------------------------------------------------------------------
 Linked Cluster Expansion program for the 1D TFIM model
 Roger Melko, Ann Kallin, Katie Hyatt June 2012
 baesd on a Lanczos code from November 2007
@@ -76,11 +78,11 @@ int main(int argc, char** argv){
     vector< graph > fileGraphs; //graph objects
     
     // List of weights for the different graphs
-    vector<double> WeightEnergy, WeightMagnetization;
+    vector<double> WeightEnergy; // WeightMagnetization;
     vector< vector<double> > WeightLineEntropy, WeightCornerEntropy;
 
     // Running sum of "the property"
-    double RunningSumEnergy(0), RunningSumMagnetization(0);
+    double RunningSumEnergy(0);// RunningSumMagnetization(0);
     vector<double> RunningSumLineEntropy, RunningSumCornerEntropy;
 
     // the magnetization from the 1D calculation (gets measured in entropy function)
@@ -123,8 +125,8 @@ int main(int argc, char** argv){
     entVec.resize(numRenyis);
 
     // the magnetization file name for each h value & the value in it
-    string magFile;
-    double magOne(0);
+    // string magFile;
+    // double magOne(0);
 
     for(int hh=0; hh<numhVals; hh++){
       entVec.clear();
@@ -133,7 +135,8 @@ int main(int argc, char** argv){
       h = hvals[hh];
 
       //Make the magnetization file name for a given h value
-      if(LF) magOne=1;
+      /*
+	if(LF) magOne=1;
       ostringstream s;
       s<<"./MagFRRRRRiles/mag"<<h<<".input";
       magFile = s.str();
@@ -147,10 +150,11 @@ int main(int argc, char** argv){
       magOne = abs(magOne);
       // Otherwise magOne stays at 1 or the value used for the last h!
       magIn.close();
+      */
 
       //One Site Graph
       WeightEnergy.push_back(-h); //Energy weight for zero graph (one site)
-      WeightMagnetization.push_back(0);  
+      // WeightMagnetization.push_back(0);  
       //Loop through entropies
       for(int a=0; a<numRenyis; a++){
 	WeightLineEntropy[a].push_back(0);
@@ -158,7 +162,7 @@ int main(int argc, char** argv){
       }//TEST THIS TO MAKE SURE WE'RE NOT GETTING 2 ZEROS OR SOMETHING !!!___!_!_!_!_!_!_!_!
 
       RunningSumEnergy = WeightEnergy.back();      
-      RunningSumMagnetization = WeightMagnetization.back();
+      //RunningSumMagnetization = WeightMagnetization.back();
       for(int a=0; a<numRenyis; a++){
 	RunningSumLineEntropy[a] = WeightLineEntropy[a].back();
 	RunningSumCornerEntropy[a] = WeightCornerEntropy[a].back();
@@ -175,7 +179,8 @@ int main(int argc, char** argv){
       //All the *real* graphs
       for (int i=1; i<fileGraphs.size(); i++){ //skip the zeroth graph
   	
-	//---Generate the Hamiltonian--- 
+	//---Generate the Hamiltonian---
+	double magOne;
 	GENHAM HV(fileGraphs.at(i).NumberSites,J,h,fileGraphs.at(i).AdjacencyList,LF,magOne); 
 	
 
@@ -191,7 +196,7 @@ int main(int argc, char** argv){
 	WeightEnergy.push_back(energy);
 	//Entropy1D(alpha, eVec, entVec, mag);
 	Entropy2D(alphas, eVec, entVec, fileGraphs.at(i).RealSpaceCoordinates);
-	WeightMagnetization.push_back(Magnetization(eVec));
+	//	WeightMagnetization.push_back(Magnetization(eVec));
 
 	//Loop Here!!!  ALSO MAKE NOTE THAT LINE IS FIRST AND CORNER IS SECOND !_!_!_!_!_!_!_!_!_!_!_!_!_!
 	for(int a=0; a<numRenyis; a++){
@@ -202,7 +207,7 @@ int main(int argc, char** argv){
 
 	for (int j = 0; j<fileGraphs.at(i).SubgraphList.size(); j++){
 	  WeightEnergy.back() -= fileGraphs.at(i).SubgraphList[j].second * WeightEnergy[fileGraphs.at(i).SubgraphList[j].first];
-	  WeightMagnetization.back() -= fileGraphs.at(i).SubgraphList[j].second * WeightMagnetization[fileGraphs.at(i).SubgraphList[j].first];
+	  //  WeightMagnetization.back() -= fileGraphs.at(i).SubgraphList[j].second * WeightMagnetization[fileGraphs.at(i).SubgraphList[j].first];
 	  for(int a=0; a<numRenyis; a++){
 	    WeightLineEntropy[a].back() -= fileGraphs.at(i).SubgraphList[j].second * WeightLineEntropy[a][fileGraphs.at(i).SubgraphList[j].first];
 	    WeightCornerEntropy[a].back() -= fileGraphs.at(i).SubgraphList[j].second * WeightCornerEntropy[a][fileGraphs.at(i).SubgraphList[j].first];
@@ -212,7 +217,7 @@ int main(int argc, char** argv){
 	// cout<<"h="<<h<<" J="<<J<<" graph #"<<i<<" energy "<<setprecision(12)<<energy<<endl;
 	// cout<<"WeightHigh["<<i<<"] = "<<WeightHigh.back()<<endl;
 	RunningSumEnergy += WeightEnergy.back()*fileGraphs.at(i).LatticeConstant;
-	RunningSumMagnetization += WeightMagnetization.back()*fileGraphs.at(i).LatticeConstant;
+	//	RunningSumMagnetization += WeightMagnetization.back()*fileGraphs.at(i).LatticeConstant;
 	for(int a=0; a<numRenyis; a++){
 	  RunningSumLineEntropy[a] += WeightLineEntropy[a].back()*fileGraphs.at(i).LatticeConstant;
 	  RunningSumCornerEntropy[a] += WeightCornerEntropy[a].back()*fileGraphs.at(i).LatticeConstant;
@@ -227,22 +232,23 @@ int main(int argc, char** argv){
       //	  <<" CornerEnt= "<<setw(15)<<RunningSumCornerEntropy<<" Magnetization= "<<setw(15)<<RunningSumMagnetization<<endl;
      
       for(int a=0; a<alphas.size(); a++){ 
-	 cout << "h= " << setw(6) << h << " Ener= "<<setw(15)<<RunningSumEnergy<< " Mag= " << setw(15) << RunningSumMagnetization 
+	//	 cout << "h= " << setw(6) << h << " Ener= "<<setw(15)<<RunningSumEnergy<< " Mag= " << setw(15) << RunningSumMagnetization  
+	   cout << "h= " << setw(6) << h << " Ener= "<<setw(15)<<RunningSumEnergy<< "   " 
 	      << "  S_ " << setw (5) << alphas[a] << "  Line= "<< setw(16) << RunningSumLineEntropy[a] 
 	      << " Corn=" << setw(17) << RunningSumCornerEntropy[a] << endl;
       }
       cout << endl;
-
+      /*
       if(LF){ 
       ofstream magOut(magFile.c_str());
       magOut << abs(RunningSumMagnetization);
       magOut.close();
       }
-
+      */
       WeightEnergy.clear();
-      WeightMagnetization.clear();
+      // WeightMagnetization.clear();
       RunningSumEnergy=0;
-      RunningSumMagnetization=0;
+      //     RunningSumMagnetization=0;
 
       for(int a=0; a<numRenyis; a++){
 	WeightLineEntropy[a].clear();
