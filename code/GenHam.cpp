@@ -99,9 +99,11 @@ void GENHAM::SparseHamJQ()
   int si;
   double tempD;
 
+  // Loop through all the basis states (all spin sectors)
   for (unsigned int ii=0; ii<Basis.size(); ii++){
     tempH.clear(); 
     tempBas.clear();
+
 
     tempi = Basis.at(ii);
     tempBas.push_back(0); //first element (Row size)
@@ -109,7 +111,7 @@ void GENHAM::SparseHamJQ()
 
     //-----1:   diagonal 
     tempBas.push_back(BasPos.at(tempi));  
-    tempD = (*this).HdiagPart(tempi,Nsite);
+    tempD = (*this).HdiagPart(tempi,Nsite); //tempD = address of GENHAM.Hdiagpart(i,j)
     tempH.push_back(tempD); 
 
     for (int T0=0; T0<Nsite; T0++){ //T0 is your square index
@@ -119,7 +121,7 @@ void GENHAM::SparseHamJQ()
       //-----2:   first bond (Horizontal)
       tempod = tempi;
       // sj = Bond(T0,1); 
-      tempod = tempod^(1<<si);   //toggle bit 
+      tempod = tempod^(1<<si);   //flips the si spin in tempod 
 
       if (BasPos.at(tempod) > ii){ //build only upper half of matrix
         tempBas.push_back(BasPos.at(tempod));

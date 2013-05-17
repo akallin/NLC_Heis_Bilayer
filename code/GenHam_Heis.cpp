@@ -77,8 +77,8 @@ void GENHAM::FullHamJQ(){
   for (ii=0; ii<Basis.size(); ii++){
     tempi = Basis.at(ii);
 
-    //Hamiltonian for diagonal
-    tempD = (*this).HdiagPart(tempi);
+    //Hamiltonian for diagonal part
+    tempD = (*this).HdiagPart(tempi);  //tempD = address of GENHAM.Hdiagpart(i)
     Ham(ii,ii) = tempD;
 
     for (int T0=0; T0<Nsite; T0++){ // Now generate off-diagonal part
@@ -126,6 +126,7 @@ void GENHAM::SparseHamJQ()
   int si, sj,sk,sl;
   double tempD;
 
+  // Loop through all the basis states (spin 0 sector)
   for (ii=0; ii<Basis.size(); ii++){
     tempH.clear(); 
     tempBas.clear();
@@ -136,34 +137,36 @@ void GENHAM::SparseHamJQ()
 
     //-----1:   diagonal 
     tempBas.push_back(BasPos.at(tempi));  
-    tempD = (*this).HdiagPart(tempi);
+    // HdiagPart has *two* indices in the TFIM case.... do we need that?
+    tempD = (*this).HdiagPart(tempi);  //tempD = address of GENHAM.Hdiagpart(i)
     tempH.push_back(tempD); 
 
-    for (int T0=0; T0<Nsite; T0++){ //T0 is your square index
+    for (int T0=0; T0<Bond.size(); T0++){ //T0 is your square index
 
-      si = Bond(T0,0); //the lower left bond spin is not always T0
+      // si is the first element of the T0^th bond
+      si = Bond[T0].first; //the lower left bond spin is not always T0
       //if (si != T0) cout<<"Square error 2\n";
       //-----2:   first bond (Horizontal)
       tempod = tempi;
-      sj = Bond(T0,1);
-      tempod ^= (1<<si);   //toggle bit 
-      tempod ^= (1<<sj);   //toggle bit 
+      sj = Bond[T0].second; // Second element of T0th bond
+      tempod ^= (1<<si);   //flips si spin in tempod
+      tempod ^= (1<<sj);   //flips sj spin in tempod
       if (BasPos.at(tempod) != -1 && BasPos.at(tempod) > ii){ //build only upper half of matrix
         tempBas.push_back(BasPos.at(tempod));
         tempD = (*this).HOFFdBondX(T0,tempi);
         tempH.push_back(tempD); 
       }
  
-       //-----3:   second bond (Vertical)
-      tempod = tempi;
-      sj = Bond(T0,2);
-      tempod ^= (1<<si);   //toggle bit 
-      tempod ^= (1<<sj);   //toggle bit 
-      if (BasPos.at(tempod) != -1 && BasPos.at(tempod) > ii){ 
-        tempBas.push_back(BasPos.at(tempod));
-        tempD = (*this).HOFFdBondY(T0,tempi);
-        tempH.push_back(tempD); 
-      }
+      /*  //-----3:   second bond (Vertical)
+	  tempod = tempi;
+	  sj = Bond(T0,2);
+	  tempod ^= (1<<si);   //toggle bit 
+	  tempod ^= (1<<sj);   //toggle bit 
+	  if (BasPos.at(tempod) != -1 && BasPos.at(tempod) > ii){ 
+	  tempBas.push_back(BasPos.at(tempod));
+	  tempD = (*this).HOFFdBondY(T0,tempi);
+	  tempH.push_back(tempD); 
+	  }*/
 
     }//si
 
