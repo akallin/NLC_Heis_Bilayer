@@ -1,7 +1,7 @@
 #include "GenHam.h"
 
 //----------------------------------------------------------
-GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vector <pair<int,int> > BBond_)   
+GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vector <pair<int,int> > BBond_, bool Field, double mag_)   
 //create bases and determine dim of full Hilbert space
 {
   JJ = J_;
