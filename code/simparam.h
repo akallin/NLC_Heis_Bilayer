@@ -17,15 +17,12 @@ class PARAMS
 
     PARAMS(){
       //initializes commonly used parameters from a file
-      ifstream pfin;
-      pfin.open("param.dat");
     
-      pfin >> NN_;
-      pfin >> JJ_;
-      pfin >> hh_;
-      pfin >> valvec_;
+      NN_ = 16;
+      JJ_ = 1.0;
+      hh_ = 1.0;
+      valvec_ = 2;
     
-      pfin.close();
     }//constructor
 
 }; //PARAMS
