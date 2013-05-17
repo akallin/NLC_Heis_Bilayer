@@ -123,7 +123,7 @@ void GENHAM::SparseHamJQ()
   //vector<long> tempBas2;
   vector<long double> tempH;
   unsigned long tempi, tempj, tempod;
-  int si, sj,sk,sl;
+  int si, sj; //,sk,sl;
   double tempD;
 
   // Loop through all the basis states (spin 0 sector)
@@ -203,20 +203,17 @@ double GENHAM::HdiagPart(const long bra){
 
   int S0b,S1b ;  //spins (bra 
   int T0,T1;  //site
-  int P0, P1, P2, P3; //sites for plaquette (Q)
-  int s0p, s1p, s2p, s3p;
+  //  int P0, P1, P2, P3; //sites for plaquette (Q)
+  //  int s0p, s1p, s2p, s3p;
   double valH = 0;
 
-  for (int Ti=0; Ti<Nsite; Ti++){
+  for (int Ti=0; Ti< Bond.size(); Ti++){
     //***HEISENBERG PART
 
-    T0 = Bond(Ti,0); //lower left spin
+    T0 = Bond[Ti].first; //first spin
     S0b = (bra>>T0)&1;  
     //if (T0 != Ti) cout<<"Square error 3\n";
-    T1 = Bond(Ti,1); //first bond
-    S1b = (bra>>T1)&1;  //unpack bra
-    valH += JJ*(S0b-0.5)*(S1b-0.5);
-    T1 = Bond(Ti,2); //second bond
+    T1 = Bond[Ti].second; //second spin
     S1b = (bra>>T1)&1;  //unpack bra
     valH += JJ*(S0b-0.5)*(S1b-0.5);
 
@@ -242,8 +239,9 @@ double GENHAM::HOFFdBondX(const int si, const long bra){
 }//HOFFdPart
 
 //----------------------------------------------------------
-double GENHAM::HOFFdBondY(const int si, const long bra){
-
+/*
+  double GENHAM::HOFFdBondY(const int si, const long bra){
+  
   double valH;
   int S0, S1;
   int T0, T1;
@@ -252,5 +250,5 @@ double GENHAM::HOFFdBondY(const int si, const long bra){
 
   return valH;
 
-}//HOFFdPart
-
+  }//HOFFdPart
+*/
