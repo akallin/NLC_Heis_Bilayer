@@ -13,7 +13,6 @@ GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vecto
 
   Dim = 2;  //  S=1/2 models : two states
   for (int ch=1; ch<Nsite; ch++) Dim *=2;
-  //  Fdim = Dim;
 
   //BasPos holds the position of state x (in the vector Basis) in its x^th element
   BasPos.resize(Dim,-1); //initialization 
@@ -155,17 +154,6 @@ void GENHAM::SparseHamJQ()
         tempD = (*this).HOFFdBondX(T0,tempi);
         tempH.push_back(tempD); 
       }
- 
-      /*  //-----3:   second bond (Vertical)
-	  tempod = tempi;
-	  sj = Bond(T0,2);
-	  tempod ^= (1<<si);   //toggle bit 
-	  tempod ^= (1<<sj);   //toggle bit 
-	  if (BasPos.at(tempod) != -1 && BasPos.at(tempod) > ii){ 
-	  tempBas.push_back(BasPos.at(tempod));
-	  tempD = (*this).HOFFdBondY(T0,tempi);
-	  tempH.push_back(tempD); 
-	  }*/
 
     }//si
 
