@@ -180,6 +180,8 @@ int main(int argc, char** argv){
 
       //All the *real* graphs
       // Changed this to i=0 instead of i=1 to test
+
+    
       for (int i=0; i<fileGraphs.size(); i++){ //skip the zeroth graph
   	
 	//---Generate the Hamiltonian---
