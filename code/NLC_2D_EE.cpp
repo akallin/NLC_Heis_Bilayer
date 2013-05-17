@@ -128,7 +128,8 @@ int main(int argc, char** argv){
     // string magFile;
     // double magOne(0);
 
-    for(int hh=0; hh<numhVals; hh++){
+    //   for(int hh=0; hh<numhVals; hh++){
+    for(int hh=0; hh<1; hh++){
       entVec.clear();
       entVec.resize(numRenyis);
 
@@ -137,23 +138,24 @@ int main(int argc, char** argv){
       //Make the magnetization file name for a given h value
       /*
 	if(LF) magOne=1;
-      ostringstream s;
-      s<<"./MagFRRRRRiles/mag"<<h<<".input";
-      magFile = s.str();
-      s.clear();
-      
-      //If the file exists read it in (only gets used in GenHam in low field case)
-      ifstream magIn(magFile.c_str());
-      if(magIn){
+	ostringstream s;
+	s<<"./MagFRRRRRiles/mag"<<h<<".input";
+	magFile = s.str();
+	s.clear();
+	
+	//If the file exists read it in (only gets used in GenHam in low field case)
+	ifstream magIn(magFile.c_str());
+	if(magIn){
 	magIn >> magOne;
-      }
-      magOne = abs(magOne);
-      // Otherwise magOne stays at 1 or the value used for the last h!
-      magIn.close();
+	}
+	magOne = abs(magOne);
+	// Otherwise magOne stays at 1 or the value used for the last h!
+	magIn.close();
       */
 
       //One Site Graph
-      WeightEnergy.push_back(-h); //Energy weight for zero graph (one site)
+      // WeightEnergy.push_back(-h); //Energy weight for zero graph (one site)
+      WeightEnergy.push_back(0);
       // WeightMagnetization.push_back(0);  
       //Loop through entropies
       for(int a=0; a<numRenyis; a++){
@@ -177,25 +179,29 @@ int main(int argc, char** argv){
       //RunningSumEntropy+=WeightEntropy.back();
 
       //All the *real* graphs
-      for (int i=1; i<fileGraphs.size(); i++){ //skip the zeroth graph
+      // Changed this to i=0 instead of i=1 to test
+      for (int i=0; i<fileGraphs.size(); i++){ //skip the zeroth graph
   	
 	//---Generate the Hamiltonian---
 	double magOne;
 	GENHAM HV(fileGraphs.at(i).NumberSites,J,h,fileGraphs.at(i).AdjacencyList,LF,magOne); 
 	
-
 	LANCZOS lancz(HV.Vdim);  //dimension of Hilbert space
 	HV.SparseHamJQ();  //generates sparse matrix Hamiltonian for Lanczos
 
 	
 	//---Diagonalize and get Eigenvector---
 	energy = lancz.Diag(HV, 1, prm.valvec_, eVec); // Hamiltonian, # of eigenvalues to converge, 1 for -values only, 2 for vals AND vectors
+	cout << " ENERGY = " << energy << endl;
 	//cout << "Graph " << i <<" energy: " << energy << endl;
 	
+
 	//---Energy/Entropy NLC Calculation---
 	WeightEnergy.push_back(energy);
 	//Entropy1D(alpha, eVec, entVec, mag);
-	Entropy2D(alphas, eVec, entVec, fileGraphs.at(i).RealSpaceCoordinates);
+
+	// COMMENTING OUT ENTROPY PART BECAUSE IT"S ALL WRONG (NOT USING THE PROPER BASIS) ATM
+	//	Entropy2D(alphas, eVec, entVec, fileGraphs.at(i).RealSpaceCoordinates);
 	//	WeightMagnetization.push_back(Magnetization(eVec));
 
 	//Loop Here!!!  ALSO MAKE NOTE THAT LINE IS FIRST AND CORNER IS SECOND !_!_!_!_!_!_!_!_!_!_!_!_!_!
@@ -203,6 +209,7 @@ int main(int argc, char** argv){
 	  WeightLineEntropy[a].push_back(entVec[a].first);
 	  WeightCornerEntropy[a].push_back(entVec[a].second);
 	}
+
 	//cout<<"Entropy "<<i<<" = "<<WeightEntropy.back()<<endl;
 
 	for (int j = 0; j<fileGraphs.at(i).SubgraphList.size(); j++){
