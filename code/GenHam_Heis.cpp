@@ -12,9 +12,8 @@ GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vecto
   Nsite = Ns;
 
   Dim = 2;  //  S=1/2 models : two states
-  // Multiplied Nsite by 2 for the bilayer
-  for (int ch=1; ch<2*Nsite; ch++) Dim *=2;
-  Fdim = Dim;
+  for (int ch=1; ch<Nsite; ch++) Dim *=2;
+  //  Fdim = Dim;
 
   //BasPos holds the position of state x (in the vector Basis) in its x^th element
   BasPos.resize(Dim,-1); //initialization 
@@ -43,7 +42,7 @@ void GENHAM::printg()
 {
   int i,j;
   vector<int> tempP;
-  vector<h_float> tempV;
+  vector<long double> tempV;
 
   for (i=0; i<PosHam.size(); i++){
     //cout<<PosHam[i][0]<<" * ";
@@ -58,7 +57,7 @@ void GENHAM::printg()
 
 
 //----------------------------------------------------------
-void GENHAM::FullHamJQ(){
+/*void GENHAM::FullHamJQ(){
 
   int ii, tempI;
   vector<long> revBas(Fdim,-1);
@@ -112,7 +111,7 @@ void GENHAM::FullHamJQ(){
   }//ii
 
 }//FullHamHeis
-
+*/
 //----------------------------------------------------------
 void GENHAM::SparseHamJQ()
 {

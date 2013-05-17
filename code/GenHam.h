@@ -23,7 +23,10 @@ public:
     vector< vector< double > > Ham;
   
   GENHAM(const int N_ ,const long double J_, const long double Jh_, vector < pair<int,int> > BBond_, bool Low_, double mag_); 
+
+  GENHAM(const int N_ ,const long double J_, const long double Jh_, vector < pair<int,int> > BBond_); 
     void printg();
+
     vector< double > apply( const vector< double > & );
   
     void SparseHamJQ();
@@ -40,6 +43,7 @@ private:
   double Mag;
   
     double HdiagPart(const long, int);
+    double HdiagPart(const long);
     double HOFFdBondX(const int, const long);
     double HOFFdBondY(const int, const long);
 
