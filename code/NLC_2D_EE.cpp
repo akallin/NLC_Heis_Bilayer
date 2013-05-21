@@ -196,6 +196,8 @@ int main(int argc, char** argv){
 	energy = lancz.Diag(HV, 1, prm.valvec_, eVec); // Hamiltonian, # of eigenvalues to converge, 1 for -values only, 2 for vals AND vectors
 	cout << " ENERGY = " << energy << endl;
 	//cout << "Graph " << i <<" energy: " << energy << endl;
+
+	return 1;
 	
 
 	//---Energy/Entropy NLC Calculation---

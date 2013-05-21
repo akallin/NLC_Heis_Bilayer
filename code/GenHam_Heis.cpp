@@ -1,13 +1,17 @@
 #include "GenHam.h"
 
+// This is the main .cpp code that generates the Hamiltonian in sparse-Matrix form
+// In this case, it is the Incomplete Bilayer Heisenberg model
+
 //----------------------------------------------------------
 GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vector <pair<int,int> > BBond_, bool Field, double mag_)   
-//create bases and determine dim of full Hilbert space
+//create bases and determine the dimension of the Hilbert space
 {
-  JJ = J_;
-  JJ2 = J2_;
+  JJ = J_; //heisenberg exchange value
+  JJ2 = J2_; // J2 value (for heis bilayer)
+
   Bond = BBond_;
-  
+
   unsigned int Dim;
   Nsite = Ns;
 
@@ -24,14 +28,18 @@ GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vecto
       temp = 0;
       for (int sp =0; sp<Nsite; sp++)
           temp += (i1>>sp)&1;  //unpack bra & count the up spins
+
+      //Specifically targe the Sz=0 sector: HAMILTONIAN MUST CONSERV Sz
       if (temp==(Nsite/2) ){ 
           Basis.push_back(i1);
           BasPos.at(i1)=Basis.size()-1;
           Vdim++;
       }
+
   }//Dim
 
-  //  cout<<"Vdim "<<Vdim<<" "<<Dim<<endl;
+  //output the total and reduced Hilbert Space dimension
+  cout<<"Vdim "<<Vdim<<" "<<Dim<<endl;
 
 }//constructor
 
@@ -56,130 +64,77 @@ void GENHAM::printg()
 
 
 //----------------------------------------------------------
-/*void GENHAM::FullHamJQ(){
-
-  int ii, tempI;
-  vector<long> revBas(Fdim,-1);
-
-  for (ii=0; ii<Basis.size(); ii++) { //reverse lookup
-    tempI = Basis.at(ii);
-    revBas.at(tempI) = ii;
-  }
-    
-  Ham.resize(Vdim,Vdim);
-  Ham = 0;
-
-  unsigned long tempi, tempj, tempod;
-  double tempD;
-  int si,sj,sk,sl, revPos;
-  for (ii=0; ii<Basis.size(); ii++){
-    tempi = Basis.at(ii);
-
-    //Hamiltonian for diagonal part
-    tempD = (*this).HdiagPart(tempi);  //tempD = address of GENHAM.Hdiagpart(i)
-    Ham(ii,ii) = tempD;
-
-    for (int T0=0; T0<Nsite; T0++){ // Now generate off-diagonal part
-
-      si = Bond(T0,0);
-      //if (si != T0) cout<<"Square error \n";
-      // X Bond
-      tempod = tempi;
-      sj = Bond(T0,1);
-      tempod ^= (1<<si);   //toggle bit 
-      tempod ^= (1<<sj);   //toggle bit 
-      revPos = revBas.at(tempod);
-      if (revPos != -1){
-        tempD = (*this).HOFFdBondX(T0,tempi);
-        Ham(ii,revPos) = tempD;
-      }
-
-      // Y Bond
-      tempod = tempi;
-      sj = Bond(T0,2);
-      tempod ^= (1<<si);   //toggle bit 
-      tempod ^= (1<<sj);   //toggle bit 
-      revPos = revBas.at(tempod);
-      if (revPos != -1){
-        tempD = (*this).HOFFdBondY(T0,tempi);
-        Ham(ii,revPos) = tempD;
-      }
-
-    }//si
-
-  }//ii
-
-}//FullHamHeis
-*/
-//----------------------------------------------------------
 void GENHAM::SparseHamJQ()
+//This function generates a sparse-matrix representation of the Hamiltonian.
+
 {
   int ii, jj;
 
   int Rsize;
   vector<long> tempBas;
-  //vector<long> tempBas2;
   vector<long double> tempH;
+
   unsigned long tempi, tempj, tempod;
-  int si, sj; //,sk,sl;
+  int si, sj; 
   double tempD;
 
   // Loop through all the basis states (spin 0 sector)
   for (ii=0; ii<Basis.size(); ii++){
-    tempH.clear(); 
-    tempBas.clear();
+      tempH.clear(); 
+      tempBas.clear();
 
-    tempi = Basis.at(ii);
-    tempBas.push_back(0); //first element (Row size)
-    tempH.push_back(0); //make base 0
+      tempi = Basis.at(ii);
+      tempBas.push_back(0); //first element (Row size)
+      tempH.push_back(0); //make base 0
 
-    //-----1:   diagonal 
-    tempBas.push_back(BasPos.at(tempi));  
-    // HdiagPart has *two* indices in the TFIM case.... do we need that?
-    tempD = (*this).HdiagPart(tempi);  //tempD = address of GENHAM.Hdiagpart(i)
-    tempH.push_back(tempD); 
+      //-----1:  Create the diagonal part of the Hamiltonian
+      tempBas.push_back(BasPos.at(tempi));  
 
-    for (int T0=0; T0<Bond.size(); T0++){ //T0 is your square index
+      // HdiagPart has *two* indices in the TFIM case.... do we need that?
+      tempD = (*this).HdiagPart(tempi);  //tempD = address of GENHAM.Hdiagpart(i)
+      tempH.push_back(tempD); 
 
-      // si is the first element of the T0^th bond
-      si = Bond[T0].first; //the lower left bond spin is not always T0
-      //if (si != T0) cout<<"Square error 2\n";
-      //-----2:   first bond (Horizontal)
-      tempod = tempi;
-      sj = Bond[T0].second; // Second element of T0th bond
-      tempod ^= (1<<si);   //flips si spin in tempod
-      tempod ^= (1<<sj);   //flips sj spin in tempod
-      if (BasPos.at(tempod) != -1 && BasPos.at(tempod) > ii){ //build only upper half of matrix
-        tempBas.push_back(BasPos.at(tempod));
-        tempD = (*this).HOFFdBondX(T0,tempi);
-        tempH.push_back(tempD); 
-      }
+      for (int T0=0; T0<Bond.size(); T0++){ //T0 is your square index
 
-    }//si
+          // si is the first element of the T0^th bond
+          si = Bond[T0].first; //the lower left bond spin is not always T0
+          //if (si != T0) cout<<"Square error 2\n";
+          //-----2:   first bond (Horizontal)
+          tempod = tempi;
+          sj = Bond[T0].second; // Second element of T0th bond
+          tempod ^= (1<<si);   //flips si spin in tempod
+          tempod ^= (1<<sj);   //flips sj spin in tempod
+          if (BasPos.at(tempod) != -1 && BasPos.at(tempod) > ii){ //build only upper half of matrix
+              tempBas.push_back(BasPos.at(tempod));
+              tempD = (*this).HOFFdBondX(T0,tempi);
+              tempH.push_back(tempD); 
+          }
 
-    tempBas.at(0) = tempBas.size()-1;
-    //cout<<tempBas.at(0)<<" "<<tempBas.size()<<" "<<tempH.size()<<endl;
+      }//si
 
-    //bubble sort (slow) 
-    long stemp;
-    bool noswap = false;
-    while (noswap == false){
-      noswap = true; 
-      for (int i2=1; i2<tempBas.size()-1; i2++){ //ignore 0 element
-        if (tempBas.at(i2) > tempBas.at(i2+1) ) {
-          stemp = tempBas.at(i2);
-          tempBas.at(i2) = tempBas.at(i2+1);
-          tempBas.at(i2+1) = stemp;
-          tempD = tempH.at(i2);
-          tempH.at(i2) = tempH.at(i2+1);
-          tempH.at(i2+1) = tempD;
-          noswap = false;
-        }
-      }//i2
-    }//while
+      tempBas.at(0) = tempBas.size()-1;
+      //cout<<tempBas.at(0)<<" "<<tempBas.size()<<" "<<tempH.size()<<endl;
 
-    PosHam.push_back(tempBas);
-    ValHam.push_back(tempH);
+      //bubble sort (slow) 
+      long stemp;
+      bool noswap = false;
+      while (noswap == false){
+          noswap = true; 
+          for (int i2=1; i2<tempBas.size()-1; i2++){ //ignore 0 element
+              if (tempBas.at(i2) > tempBas.at(i2+1) ) {
+                  stemp = tempBas.at(i2);
+                  tempBas.at(i2) = tempBas.at(i2+1);
+                  tempBas.at(i2+1) = stemp;
+                  tempD = tempH.at(i2);
+                  tempH.at(i2) = tempH.at(i2+1);
+                  tempH.at(i2+1) = tempD;
+                  noswap = false;
+              }
+          }//i2
+      }//while
+
+      PosHam.push_back(tempBas);
+      ValHam.push_back(tempH);
 
   }//ii       
 
@@ -225,17 +180,3 @@ double GENHAM::HOFFdBondX(const int si, const long bra){
 
 }//HOFFdPart
 
-//----------------------------------------------------------
-/*
-  double GENHAM::HOFFdBondY(const int si, const long bra){
-  
-  double valH;
-  int S0, S1;
-  int T0, T1;
-
-  valH = JJ*0.5; //contribution from the J part of the Hamiltonian
-
-  return valH;
-
-  }//HOFFdPart
-*/

@@ -9,43 +9,38 @@ using namespace std;
 
 class GENHAM{
 
-public:
-    int Vdim; //dimenson of reduced Hilbert space
-  
-    vector<vector<long> > PosHam;
-    vector<vector< long double > > ValHam;
-    //vector<double> DiagHam;
-  
-    vector<long> Basis;
-    vector<long> BasPos;
-    vector<int> ConnectCount;
-  
-    vector< vector< double > > Ham;
-  
-  GENHAM(const int N_ ,const long double J_, const long double Jh_, vector < pair<int,int> > BBond_, bool Low_, double mag_); 
+    public:
+        int Vdim; //dimenson of reduced Hilbert space
 
-  //  GENHAM(const int N_ ,const long double J_, const long double Jh_, vector < pair<int,int> > BBond_); 
-    void printg();
+        //The sparse matrix represenation of the Hamiltonian
+        vector<vector<long> > PosHam;
+        vector<vector< long double > > ValHam;
 
-    vector< double > apply( const vector< double > & );
-  
-    void SparseHamJQ();
+        //The Hilbert Space
+        vector<long> Basis;
+        vector<long> BasPos;
 
-private:
-    int Nsite; //number sites
-    bool LowField; //High or Low Field expansion
-  
-    vector< pair < int,int> > Bond;
+        //The constructor
+        GENHAM(const int N_ ,const long double J_, const long double Jh_, 
+                vector < pair<int,int> > BBond_, bool Low_, double mag_); 
 
-    long double JJ; //heisenberg exchange value
-    long double hh; //next-nearest neighbor exchange value
-  long double JJ2; // J2 value (for heis bilayer)
-  double Mag;
-  
-    double HdiagPart(const long, int);
-    double HdiagPart(const long);
-    double HOFFdBondX(const int, const long);
-    double HOFFdBondY(const int, const long);
+        void printg();
+
+        //The function that makes the Hamiltonian
+        void SparseHamJQ();
+
+    private:
+        int Nsite; //number sites
+        bool LowField; //High or Low Field expansion
+
+        vector< pair < int,int> > Bond;
+
+        long double JJ; //heisenberg exchange value
+        long double JJ2; // J2 value (for heis bilayer)
+
+        double HdiagPart(const long, int);
+        double HdiagPart(const long);
+        double HOFFdBondX(const int, const long);
 
 };
 
