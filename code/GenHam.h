@@ -22,7 +22,7 @@ class GENHAM{
 
         //The constructor
         GENHAM(const int N_ ,const long double J_, const long double Jh_, 
-                vector < pair<int,int> > BBond_, bool Low_, double mag_); 
+                vector < pair<int,int> > BBond_); 
 
         void printg();
 

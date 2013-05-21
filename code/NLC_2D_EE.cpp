@@ -85,9 +85,6 @@ int main(int argc, char** argv){
     double RunningSumEnergy(0);// RunningSumMagnetization(0);
     vector<double> RunningSumLineEntropy, RunningSumCornerEntropy;
 
-    // the magnetization from the 1D calculation (gets measured in entropy function)
-    //double mag;
-
     // Self explanatory (good naming convention, Katie)
     ReadGraphsFromFile(fileGraphs, InputFile);
 
@@ -124,34 +121,12 @@ int main(int argc, char** argv){
     WeightCornerEntropy.resize(numRenyis);
     entVec.resize(numRenyis);
 
-    // the magnetization file name for each h value & the value in it
-    // string magFile;
-    // double magOne(0);
-
     //   for(int hh=0; hh<numhVals; hh++){
     for(int hh=0; hh<1; hh++){
       entVec.clear();
       entVec.resize(numRenyis);
 
       h = hvals[hh];
-
-      //Make the magnetization file name for a given h value
-      /*
-	if(LF) magOne=1;
-	ostringstream s;
-	s<<"./MagFRRRRRiles/mag"<<h<<".input";
-	magFile = s.str();
-	s.clear();
-	
-	//If the file exists read it in (only gets used in GenHam in low field case)
-	ifstream magIn(magFile.c_str());
-	if(magIn){
-	magIn >> magOne;
-	}
-	magOne = abs(magOne);
-	// Otherwise magOne stays at 1 or the value used for the last h!
-	magIn.close();
-      */
 
       //One Site Graph
       // WeightEnergy.push_back(-h); //Energy weight for zero graph (one site)
@@ -185,8 +160,7 @@ int main(int argc, char** argv){
       for (int i=0; i<fileGraphs.size(); i++){ //skip the zeroth graph
   	
 	//---Generate the Hamiltonian---
-	double magOne;
-	GENHAM HV(fileGraphs.at(i).NumberSites,J,h,fileGraphs.at(i).AdjacencyList,LF,magOne); 
+	GENHAM HV(fileGraphs.at(i).NumberSites,J,h,fileGraphs.at(i).AdjacencyList); 
 	
 	LANCZOS lancz(HV.Vdim);  //dimension of Hilbert space
 	HV.SparseHamJQ();  //generates sparse matrix Hamiltonian for Lanczos

@@ -4,7 +4,7 @@
 // In this case, it is the Incomplete Bilayer Heisenberg model
 
 //----------------------------------------------------------
-GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vector <pair<int,int> > BBond_, bool Field, double mag_)   
+GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vector <pair<int,int> > BBond_)   
 //create bases and determine the dimension of the Hilbert space
 {
   JJ = J_; //heisenberg exchange value

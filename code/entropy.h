@@ -5,55 +5,30 @@
 void getEE( vector <double>& alpha1, vector <double>& CornLineEnts, vector< vector<long double> >& SuperMat );
 
 
-inline double TwoSiteEntropy(double h, double alpha)
-{
-  double CommonEnt;
-  double DiffEnt;
-  double unLog;
-  CommonEnt = 0.5 + (1. + sqrt(1. + 4.*h*h))/(8.*h*h);
-  DiffEnt = h*sqrt(1.+2.*h*h+sqrt(1.+4.*h*h))/2./sqrt(2.0);
-  
-  unLog = pow(CommonEnt + DiffEnt,alpha) + pow(abs(CommonEnt - DiffEnt),alpha);
-  
-  // cout << CommonEnt << "  " << DiffEnt << endl;
-  if(alpha==1.0){
-    // cout << CommonEnt - DiffEnt << endl;
-    return -(CommonEnt + DiffEnt)*log(CommonEnt + DiffEnt) 
-      - abs(CommonEnt - DiffEnt)*log(abs(CommonEnt - DiffEnt));
-  }
-  else{
-    return (1./(1.-alpha))*log(unLog);
-  }
-}
+/* ---  This function isn't necessary for Heis, where the 2-site entropy is always
+   log 2 for J>0
+   inline double TwoSiteEntropy(double h, double alpha)
+   {
+   double CommonEnt;
+   double DiffEnt;
+   double unLog;
+   CommonEnt = 0.5 + (1. + sqrt(1. + 4.*h*h))/(8.*h*h);
+   DiffEnt = h*sqrt(1.+2.*h*h+sqrt(1.+4.*h*h))/2./sqrt(2.0);
+   
+   unLog = pow(CommonEnt + DiffEnt,alpha) + pow(abs(CommonEnt - DiffEnt),alpha);
+   
+   // cout << CommonEnt << "  " << DiffEnt << endl;
+   if(alpha==1.0){
+   // cout << CommonEnt - DiffEnt << endl;
+   return -(CommonEnt + DiffEnt)*log(CommonEnt + DiffEnt) 
+   - abs(CommonEnt - DiffEnt)*log(abs(CommonEnt - DiffEnt));
+   }
+   else{
+   return (1./(1.-alpha))*log(unLog);
+   }
+   }
+*/
 
-
-inline double Magnetization( Array<l_double,1>& eigs ){
-  // The dimension is number of eigenvalues
-  long int Dim = eigs.size();
-
-  // Get number of sites from the dimension
-  int Nsite = log2(Dim); 
-
-  // -8-8-8-8- Measure the Magnetization!!! -8-8-8-8-
-  long double magnetization(0);
-  double norm(0);
-  int itemp(0);
-  for(int i=0; i<Dim; i++){ 
-    for (int sp=0; sp<Nsite; sp++){
-      itemp += (i>>sp)&1; 
-    }
-    
-    //cout << "   i=" <<i << ",  " << abs(itemp*2-Nsite) << "  eig(i)=" <<  eigs(i);
-    //magnetization += sqrt((itemp*2-Nsite)*(itemp*2-Nsite))*eigs(i)*eigs(i);
-    magnetization += (itemp*2.0 - Nsite*1.0)*eigs(i)*eigs(i);
-    itemp=0;
-    norm += eigs(i)*eigs(i);
-  }
-  //cout << "norm="<< norm << endl; norm=0;
-  //cout << "mag= " <<magnetization<<endl;
-  return magnetization;
-  // -8-8-8-8- End of Magnetization -8-8-8-8-
-}
 		      
 inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< pair<double,double> >& ents, vector< vector< int > >& RScoords)
  {
