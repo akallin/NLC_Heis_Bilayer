@@ -49,7 +49,7 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
     // Get the dimensions of region A and B;
     // states don't necessarily have Sz=0 in their regions 
     // if NA > N/2 or NB > N/2
-    Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, BbasPos);
+    Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
     Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
     cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
 
@@ -103,12 +103,11 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
       }	
       // Unshift bState by 1 (because there was one extra)
       bState = bState>>1;
-
       // CHANGE THIS!!! (if the region has > N/2 sites then its basis needs to be *translated*)
       //
-      SuperMat[aState][bState] = eigs(i);
+      SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs(i);
     }
-    
+
     // ------ GET ENTROPY!!! ------
     getEE(alpha1, tempEnt, SuperMat);
     for(int a=0; a<alpha1.size(); a++){
@@ -116,14 +115,20 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
       ents[a].second += -(xMax-1)*tempEnt[a];
       if(ySize<(yMax+1)/2){ents[a].first += tempEnt[a];  ents[a].second += -(xMax-1)*tempEnt[a];}
     }
-    
-
 
     //cout << "Adim " << Adim << "  Bdim " << Bdim << "  Hent=" << getEE(alpha,SuperMat) <<endl;
       
   
   // In the future we can just multiply all renyis by 2 except the middle one for an even system.
   }
+
+  //
+  //
+  //WORKING ABOVE THIS POINT
+  //
+  //
+
+
 
   // -*-*-*- Vertical -*-*-*-
   ySize = yMax;
@@ -272,7 +277,7 @@ unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vect
   int full_dim = full_hilb(na);
   basPosm.resize(full_dim,-1);
   unsigned int dimm;
-
+  basism.resize(0);
 
   // If the region is less than or equal to half
   // of the total number of sites (we have a full 
