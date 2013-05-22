@@ -3,47 +3,23 @@
 #define entropy_H
 
 void getEE( vector <double>& alpha1, vector <double>& CornLineEnts, vector< vector<long double> >& SuperMat );
-
-
-/* ---  This function isn't necessary for Heis, where the 2-site entropy is always
-   log 2 for J>0
-   inline double TwoSiteEntropy(double h, double alpha)
-   {
-   double CommonEnt;
-   double DiffEnt;
-   double unLog;
-   CommonEnt = 0.5 + (1. + sqrt(1. + 4.*h*h))/(8.*h*h);
-   DiffEnt = h*sqrt(1.+2.*h*h+sqrt(1.+4.*h*h))/2./sqrt(2.0);
-   
-   unLog = pow(CommonEnt + DiffEnt,alpha) + pow(abs(CommonEnt - DiffEnt),alpha);
-   
-   // cout << CommonEnt << "  " << DiffEnt << endl;
-   if(alpha==1.0){
-   // cout << CommonEnt - DiffEnt << endl;
-   return -(CommonEnt + DiffEnt)*log(CommonEnt + DiffEnt) 
-   - abs(CommonEnt - DiffEnt)*log(abs(CommonEnt - DiffEnt));
-   }
-   else{
-   return (1./(1.-alpha))*log(unLog);
-   }
-   }
-*/
-
+unsigned int full_hilb( unsigned na );
+unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long> &Abasis, vector<long> &AbasPos );
 		      
-inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< pair<double,double> >& ents, vector< vector< int > >& RScoords)
+inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< pair<double,double> >& ents, 
+		      vector< vector< int > >& RScoords, vector <long> Basis)
  {
   // Get the graph dimensions from the realspace coordinates
   int xMax = RScoords.size();
   int yMax = RScoords[0].size();
+  int Nsite = xMax*yMax;
 
   // The dimension is number of eigenvalues
   long int Dim = eigs.size();
 
-  // Get number of sites from the dimension
-  int Nsite = log2(Dim); 
-
-  // The dimensions of region A
-  int xSize(0), ySize(0), Adim(0), Bdim(0);
+  // The dimensions of region A/B. 
+  int xSize(0), ySize(0), Adim, Bdim;
+  vector <long> Abasis, Bbasis, AbasPos, BbasPos;
 
   // A rectangular matrix containing the eigenvalues, used to get the RDM
   vector< vector< long double > > SuperMat;
@@ -69,9 +45,13 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
   xSize = xMax;
   // Iterate over the horizontal cuts
   for(int ySize=1; ySize<=yMax/2; ySize++){
+    
     // Get the dimensions of region A and B;
-    Adim = 1<<xSize*ySize; 
-    Bdim = Dim/Adim; 
+    // states don't necessarily have Sz=0 in their regions 
+    // if NA > N/2 or NB > N/2
+    Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, BbasPos);
+    Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
+    cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
 
     // Initialize the matrix of eigenvalues
     SuperMat.resize(Adim);
@@ -80,7 +60,7 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
     // Loop over all the basis states
     for(int i=0; i<Dim; i++){      
       // extractifying the region A and region B states
-      tempState = i;
+      tempState = Basis[i];
       
       // Loop over region A
       aState=0; // Initialize the state in region A
@@ -124,6 +104,8 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
       // Unshift bState by 1 (because there was one extra)
       bState = bState>>1;
 
+      // CHANGE THIS!!! (if the region has > N/2 sites then its basis needs to be *translated*)
+      //
       SuperMat[aState][bState] = eigs(i);
     }
     
@@ -285,8 +267,58 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
   }
 }
 
+unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vector<long>& basPosm )
+{
+  int full_dim = full_hilb(na);
+  basPosm.resize(full_dim,-1);
+  unsigned int dimm;
+
+
+  // If the region is less than or equal to half
+  // of the total number of sites (we have a full 
+  // unrestricted basis) Dim = 2^na
+  if (na<=n/2){
+    dimm = full_dim;	
+    for (unsigned long i1=0; i1<full_dim; i1++) 
+      {
+	//Trivial Basis
+	basism.push_back(i1);
+	basPosm.at(i1)=basism.size()-1;
+      }
+  }
+
+
+  // Otherwise Dim is more complicated!
+  else{
+    dimm = 0;
+    int temp(0);
+    for (unsigned long i1=0; i1<full_dim; i1++) 
+      {
+	temp = 0;
+	for (int sp =0; sp<na; sp++)
+          temp += (i1>>sp)&1;  //unpack bra & count the up spins
+
+	//can't have more than N/2 up spins or down spins
+	if (temp<=(n/2) && temp>=(na-n/2) ){ 
+          basism.push_back(i1);
+          basPosm.at(i1)=basism.size()-1;
+          dimm++;
+	}
+      }
+  }
+
+
+  return dimm;
+}
+
+// Just does 2^na
+unsigned int full_hilb( unsigned na ){
+  unsigned int result = 1;
+  for(int i=0; i<na; i++) result *=2;
+  return result;
+}
+
 void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vector<long double> >& SuperMat ){
-  
   // The Density Matrix
   Array <double,2> DM;
   long double temp(0);
@@ -327,8 +359,9 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
   
   //Diagonalizing the RDM
   while(dd.size()>0){dd.erase(dd.begin());}
+  //diagWithLapack_R is giving a segfault
   diagWithLapack_R(DM,dd);
- 
+
   double EE(0);
   double vN(0), renyi(0); 
   temp=0;

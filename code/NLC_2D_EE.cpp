@@ -171,7 +171,7 @@ int main(int argc, char** argv){
 	cout << " ENERGY = " << energy << endl;
 	//cout << "Graph " << i <<" energy: " << energy << endl;
 
-	return 1;
+	//	return 1;
 	
 
 	//---Energy/Entropy NLC Calculation---
@@ -179,7 +179,7 @@ int main(int argc, char** argv){
 	//Entropy1D(alpha, eVec, entVec, mag);
 
 	// COMMENTING OUT ENTROPY PART BECAUSE IT"S ALL WRONG (NOT USING THE PROPER BASIS) ATM
-	//	Entropy2D(alphas, eVec, entVec, fileGraphs.at(i).RealSpaceCoordinates);
+	Entropy2D(alphas, eVec, entVec, fileGraphs.at(i).RealSpaceCoordinates, HV.Basis);
 	//	WeightMagnetization.push_back(Magnetization(eVec));
 
 	//Loop Here!!!  ALSO MAKE NOTE THAT LINE IS FIRST AND CORNER IS SECOND !_!_!_!_!_!_!_!_!_!_!_!_!_!
