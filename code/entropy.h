@@ -135,8 +135,9 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
   // Iterate over the vectical cuts
   for(int xSize=1; xSize<=xMax/2; xSize++){
     // Get the dimensions of region A and B;
-    Adim = 1<<xSize*ySize; 
-    Bdim = Dim/Adim; 
+    Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
+    Bdim = regionDim_NA_N(Nsite - xSize*ySize, Nsite, Bbasis, BbasPos);
+    cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
 
     // Initialize the matrix of eigenvalues
     SuperMat.resize(Adim);
@@ -145,7 +146,7 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
     // Loop over all the basis states
     for(int i=0; i<Dim; i++){      
       // extractifying the region A and region B states
-      tempState = i;
+      tempState = Basis[i];
       
       // Loop over region A
       aState=0; // Initialize the state in region A
@@ -189,7 +190,7 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
       // Unshift bState by 1 (because there was one extra)
       bState = bState>>1;
 
-      SuperMat[aState][bState] = eigs(i);
+      SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs(i);
     }
      
     // ------ GET ENTROPY!!! ------
@@ -205,8 +206,9 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
   for(int ySize=1; ySize<yMax; ySize++){
     for(int xSize=1; xSize<xMax; xSize++){
       // Get the dimensions of region A and B;
-      Adim = 1<<xSize*ySize; 
-      Bdim = Dim/Adim; 
+      Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
+      Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
+      cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;      
 
       // Initialize the matrix of eigenvalues
       SuperMat.resize(Adim);
@@ -215,7 +217,7 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
       // Loop over all the basis states
       for(int i=0; i<Dim; i++){      
 	// extractifying the region A and region B states
-	tempState = i;
+	tempState = Basis[i];
 	
 	// Loop over region A
 	aState=0; // Initialize the state in region A
@@ -260,7 +262,7 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
 	// Unshift bState by 1 (because there was one extra)
 	bState = bState>>1;
 	
-	SuperMat[aState][bState] = eigs(i);
+	SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs(i);
       }
       
       // ------ GET ENTROPY!!! ------
