@@ -34,7 +34,9 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
   // make the entropy vector a nonzero size
   tempEnt.resize(alpha1.size());
   for(int a=0; a<ents.size(); a++){
+    //line ents
     ents[a].first = 0;
+    //corner ents
     ents[a].second = 0;
     tempEnt[a] = 0;
   }
@@ -112,6 +114,7 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
     getEE(alpha1, tempEnt, SuperMat);
     for(int a=0; a<alpha1.size(); a++){
       ents[a].first += tempEnt[a];
+      cout << "line S_" << a+1 << " = " << tempEnt[a] << endl;
       ents[a].second += -(xMax-1)*tempEnt[a];
       if(ySize<(yMax+1)/2){ents[a].first += tempEnt[a];  ents[a].second += -(xMax-1)*tempEnt[a];}
     }
@@ -269,6 +272,7 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
       getEE(alpha1, tempEnt, SuperMat);
       for(int a=0; a<alpha1.size(); a++){
 	ents[a].second += 2.*tempEnt[a];
+	cout << "corner S_" << a+1 << " = " << tempEnt[a] << endl;
       }
     }
   }

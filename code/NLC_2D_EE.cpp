@@ -107,7 +107,7 @@ int main(int argc, char** argv){
     // The Renyi entropies to measure (if it's not set in commandline)
     vector <double> alphas;
     if(alpha==0){
-      for(double a1=0.5; a1<3.03; a1+=0.25){
+      for(double a1=1; a1<3.03; a1+=1){
 	alphas.push_back(a1);
       }
     }
@@ -178,9 +178,7 @@ int main(int argc, char** argv){
 	WeightEnergy.push_back(energy);
 	//Entropy1D(alpha, eVec, entVec, mag);
 
-	// COMMENTING OUT ENTROPY PART BECAUSE IT"S ALL WRONG (NOT USING THE PROPER BASIS) ATM
 	Entropy2D(alphas, eVec, entVec, fileGraphs.at(i).RealSpaceCoordinates, HV.Basis);
-	//	WeightMagnetization.push_back(Magnetization(eVec));
 
 	//Loop Here!!!  ALSO MAKE NOTE THAT LINE IS FIRST AND CORNER IS SECOND !_!_!_!_!_!_!_!_!_!_!_!_!_!
 	for(int a=0; a<numRenyis; a++){
