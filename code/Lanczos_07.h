@@ -18,7 +18,8 @@ using namespace std;
 
 #include "GenHam.h"
 
-typedef long double l_double;  //precision for lanczos
+//typedef long double l_double;  //precision for lanczos
+typedef double l_double;  //precision for lanczos
 
 class LANCZOS{
 
