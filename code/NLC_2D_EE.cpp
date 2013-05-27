@@ -69,7 +69,7 @@ int main(int argc, char** argv){
     h=prm.hh_;
 
     //eigenvector
-    Array<l_double,1> eVec;
+    vector<l_double> eVec;
 
     //vector of entropies that gets passed to the entropy function
     // contains both corner and line terms

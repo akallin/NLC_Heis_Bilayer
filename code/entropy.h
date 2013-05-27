@@ -6,7 +6,7 @@ void getEE( vector <double>& alpha1, vector <double>& CornLineEnts, vector< vect
 unsigned int full_hilb( unsigned na );
 unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long> &Abasis, vector<long> &AbasPos );
 		      
-inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< pair<double,double> >& ents, 
+inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< pair<double,double> >& ents, 
 		      vector< vector< int > >& RScoords, vector <long> Basis)
  {
   // Get the graph dimensions from the realspace coordinates
@@ -107,7 +107,7 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
       bState = bState>>1;
       // CHANGE THIS!!! (if the region has > N/2 sites then its basis needs to be *translated*)
       //
-      SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs(i);
+      SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
     }
 
     // ------ GET ENTROPY!!! ------
@@ -193,7 +193,7 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
       // Unshift bState by 1 (because there was one extra)
       bState = bState>>1;
 
-      SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs(i);
+      SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
     }
      
     // ------ GET ENTROPY!!! ------
@@ -265,7 +265,7 @@ inline void Entropy2D(vector <double>& alpha1, Array<l_double,1>& eigs, vector< 
 	// Unshift bState by 1 (because there was one extra)
 	bState = bState>>1;
 	
-	SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs(i);
+	SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
       }
       
       // ------ GET ENTROPY!!! ------
