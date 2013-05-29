@@ -24,9 +24,7 @@ typedef double l_double;  //precision for lanczos
 class LANCZOS{
 
   public:
-    //Data
-    int Dim; //dimension
-    //    Array<l_double,1> Psi;  //eigenvector
+    int Dim; //dimension 
 
    //Methods
    LANCZOS(const int);
@@ -34,7 +32,7 @@ class LANCZOS{
    void tred3(vector< vector<double> >& , vector<double>& , vector<double>& e, const int );
 
   private:
-   int STARTIT;
+   int STARTIT;  //how many iterations to "always" perform
    l_double CONV_PREC; //convergence precision
 
    vector<l_double> V0;  

@@ -3,7 +3,7 @@ NLCE for the Heisenberg Bilayer!
 ------------------------------------------------------------------
 Linked Cluster Expansion program for the 1D TFIM model
 Roger Melko, Ann Kallin, Katie Hyatt June 2012
-baesd on a Lanczos code from November 2007
+baesd on a Lanczos code from November 2007, modified 2013
 ********************************************************************/
 
 #include <utility>
@@ -17,10 +17,7 @@ using namespace std;
 #include <stdio.h>
 #include <time.h>
 #include <iomanip>
-//#include <blitz/array.h>
 #include <sstream>
-
-//BZ_USING_NAMESPACE(blitz)
 
 #include "Lanczos_07.h"
 #include "GenHam.h"

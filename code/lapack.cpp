@@ -8,21 +8,9 @@
 /// This is a quote of a post in comp.lang.c++:
 /// (search for "preventing multiple definition")  
 ///
-///-----------------------------------------------------------------
-/// In fact, my last answer is wrong. What really happened here
-/// is the following:
-/// You can't DEFINE (not declare) a function in a file that is
-/// included by other files unless this function is inlined
-/// (explicitly or inside a class). What you should do in this case
-/// is the following:
-/// 1) Put the definition of the function f() in a separate file
-///   and compile it to an object file as you did with a.cpp an
-///   b.cpp.
-/// 2) Create a header file with the declaration of the function
-///   f() and include it by a.cpp, b.cpp and foo.c
-/// - OR -
-/// 1) Inline the function f() in your file 'c'. 
-///-----------------------------------------------------------------
+///
+/// This was stripped away in May 2013 by Roger Melko for use in extracting the 
+/// entanglement entropy with NLCE
 ///
 #include"lapack.h"
 /*****************************************************************************/
@@ -51,7 +39,7 @@ void diagWithLapack_R(double *a, vector<double>& EigenVals, int &rows_, int &col
       // 
       // Output 
       //
-      for (int j=0; j<elems; j++) cout<<j<<" "<<" "<<a[j]<<endl;
+      //for (int j=0; j<elems; j++) cout<<j<<" "<<" "<<a[j]<<endl;
       //
       // Prepare to do a workspace query 
       //
@@ -92,8 +80,8 @@ void diagWithLapack_R(double *a, vector<double>& EigenVals, int &rows_, int &col
       // 
       // Output 
       //
-      for (int j=0; j<elems; j++) cout<<j<<" "<<" "<<a[j]<<endl;
-      for(int i=0; i<EigenVals.size(); i++) cout<<EigenVals[i]<<endl;
+      //for (int j=0; j<elems; j++) cout<<j<<" "<<" "<<a[j]<<endl;
+      //for(int i=0; i<EigenVals.size(); i++) cout<<EigenVals[i]<<endl;
       
       cout<<"Info "<<info<<endl;
 };

@@ -3,14 +3,10 @@
 
 LANCZOS::LANCZOS(const int Dim_) : Dim (Dim_)
 {
-  //Dim = Dim_;
+  STARTIT = 5; //I always make sure to start with at least 5 iterations (but see line 159...)
+  CONV_PREC = 1E-10; //The precision with which we converge to
 
-  STARTIT = 5;
-  CONV_PREC = 1E-10;
-
-  //  Psi.resize(Dim_);
-  V0.resize(Dim_); 
-  //Vorig.resize(Dim_);
+  V0.resize(Dim_);  //resize the 3 lanczos vectors
   V1.resize(Dim_);  
   V2.resize(Dim_);
 
@@ -41,17 +37,13 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
     int nn, rtn;
     vector<l_double> e(LIT, 0.);
     vector<l_double> d(LIT, 0.); 
-    vector< vector< l_double> > Hmatrix;
+    vector< vector< l_double> > Hmatrix; //this is a vector of vectors... wise?
     Hmatrix.resize(LIT);
     for( int ii = 0; ii < LIT; ii++)
     {
         Hmatrix[ii].resize(LIT);
     }
 
-    //tensor indices
-    //firstIndex i;    
-    //secondIndex j;
-    //thirdIndex k;   
   
     iter = 0;
 

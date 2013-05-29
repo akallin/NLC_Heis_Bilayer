@@ -4,12 +4,8 @@
 /// @author Ivan Gonzalez
 /// @date 2007-02-06
 /// 
-/// In the case of complex wavefunction the set tqli and tred3 does 
-/// not diagonalize the DM matrix properly. Here we define a wrapper 
-/// function that use the standard LAPACK function zheev to diagonalize
-/// a complex matrix. The wrapper knows about blitz arrays and the 
-/// different ordering between C and FORTRAN.
 ///
+/// Blitz removed, and file stripped down for NLCE: Roger Melko, May 2013
 #ifndef LAPACK_H
 #define LAPACK_H
 
