@@ -331,7 +331,9 @@ unsigned int full_hilb( unsigned na ){
 
 void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vector<long double> >& SuperMat ){
   // The Density Matrix
-  Array <double,2> DM;
+  //Array <double,2> DM;
+  double *DM; //create a pointer to a c-style array
+
   long double temp(0);
   int Dim(0);
 
@@ -339,28 +341,34 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
   // If Adim > Bdim TRANSPOSE!!
   if(SuperMat.size()>SuperMat[0].size()){
     Dim = SuperMat[0].size();
-    DM.resize(Dim,Dim);
+    //DM.resize(Dim,Dim);
+	DM= new double[Dim*Dim];  //This is a c-style array
+
     for(int i=0; i<Dim; i++){
       for(int j=0; j<Dim; j++){
 	temp=0;
 	for(int k=0; k<SuperMat.size(); k++){
 	  temp += SuperMat[k][i]*SuperMat[k][j];
 	}
-	DM(i,j) = temp;
+	//DM[j*Dim + i] = temp; //fortran ordered?
+	DM[i*Dim + j] = temp; //matrix is symmetric
       }
     }
   }
   // Otherwise, use Adim
   else{
     Dim = SuperMat.size();
-    DM.resize(Dim,Dim);
+    //DM.resize(Dim,Dim);
+	DM= new double[Dim*Dim];  //This is a c-style array
+
     for(int i=0; i<Dim; i++){
       for(int j=0; j<Dim; j++){
 	temp=0;
 	for(int k=0; k<SuperMat[0].size(); k++){
 	  temp += SuperMat[i][k]*SuperMat[j][k];
 	}
-	DM(i,j) = temp; 
+	//DM[j*Dim + i] = temp; //fortran ordered?
+	DM[i*Dim + j] = temp; //matrix is symmetric
       }
     }
   }
@@ -371,7 +379,10 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
   //Diagonalizing the RDM
   while(dd.size()>0){dd.erase(dd.begin());}
   //diagWithLapack_R is giving a segfault
-  diagWithLapack_R(DM,dd);
+  diagWithLapack_R(DM,dd,Dim,Dim);
+
+  //clean up DM, unless you need it anywhere below
+  delete [] DM;
 
   double EE(0);
   double vN(0), renyi(0); 
@@ -395,12 +406,12 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
       vN += -dd[s]*temp;
  
       // Same problem. If they're too small they get set to 0.
-      if(abs(dd[s])<1e-15){dd[s]=0;}
+      if(fabs(dd[s])<1e-15){dd[s]=0;}
       
       renyi+=pow(dd[s],alpha2[a]);
     }    
     
-    if(abs(alpha2[a]-1.0)<0.000001){EE = vN;}
+    if(fabs(alpha2[a]-1.0)<0.000001){EE = vN;}
     else{EE = 1./(1.-alpha2[a])*log(renyi);}
     
     CornLineEnts[a] = EE;

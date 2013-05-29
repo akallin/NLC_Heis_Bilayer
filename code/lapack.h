@@ -12,11 +12,10 @@
 ///
 #ifndef LAPACK_H
 #define LAPACK_H
-//#include "precompile_methods.h"
-#include<complex>
-#include <blitz/array.h>
-#include<vector>
-BZ_USING_NAMESPACE(blitz)
+
+//#include<complex>
+//#include<vector>
+#include"Lanczos_07.h"
 
 /*****************************************************************************/
 ///
@@ -24,27 +23,23 @@ BZ_USING_NAMESPACE(blitz)
 ///
 extern "C" {
         
-    int zheev_(char *jobz, char *uplo, int *n, complex<double> 
-	    *a, int *lda, double *w, complex<double> *work, int *lwork, 
-	    double *rwork, int *info);
- 
-    int zheevd_(char *jobz, char *uplo, int *n, 
-	    complex<double> *a, int *lda, double *w, complex<double> *work, 
-	    int *lwork, double *rwork, int *lrwork, int *iwork, 
-    	    int *liwork, int *info);
+//    int zheev_(char *jobz, char *uplo, int *n, complex<double> 
+//	    *a, int *lda, double *w, complex<double> *work, int *lwork, 
+//	    double *rwork, int *info);
+// 
+//    int zheevd_(char *jobz, char *uplo, int *n, 
+//	    complex<double> *a, int *lda, double *w, complex<double> *work, 
+//	    int *lwork, double *rwork, int *lrwork, int *iwork, 
+//    	    int *liwork, int *info);
 
     int dsyev_(char *jobz, char *uplo, int *n, double *a,
 	    int *lda, double *w, double *work, int *lwork, int *info);
 }
 /*****************************************************************************/
 ///
-/// Function to take a complex my_Matrix and diag it
-///
-void diagWithLapack(Array<complex<double>, 2>& DMpart, 
-	vector<double>& EigenVals);
-/*****************************************************************************/
-///
 /// Function to take a real my_Matrix  and diag it with lapack
 ///
-void diagWithLapack_R(Array<double, 2>& DMpart, vector<double>& EigenVals);
+//void diagWithLapack_R(Array<double, 2>& DMpart, vector<double>& EigenVals);
+void diagWithLapack_R(double *a,  vector<double>& EigenVals, int &rows_, int &cols_);
+
 #endif

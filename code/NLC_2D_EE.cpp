@@ -17,10 +17,10 @@ using namespace std;
 #include <stdio.h>
 #include <time.h>
 #include <iomanip>
-#include <blitz/array.h>
+//#include <blitz/array.h>
 #include <sstream>
 
-BZ_USING_NAMESPACE(blitz)
+//BZ_USING_NAMESPACE(blitz)
 
 #include "Lanczos_07.h"
 #include "GenHam.h"

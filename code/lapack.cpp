@@ -27,87 +27,12 @@
 #include"lapack.h"
 /*****************************************************************************/
 ///
-/// Function to take a complex my_Matrix and diag it
-///
-void diagWithLapack(Array<complex<double>, 2>& DMpart, 
-vector<double>& EigenVals)
-{
-      int rows_=DMpart.rows();
-      int cols_=DMpart.cols();
-      ///
-      /// CLAPACK function to diagonalize an Hermitian matrix
-      ///      
-      char jobz='V';
-      char uplo='U';
-      int n=cols_;
-      int lda=rows_;
-      int info;
-   
-      int elems=rows_*cols_;
-      //
-      // DMPart is hermitian so we use it to get the fortran array
-      //
-      complex<double>* a;
-      a=( DMpart.transpose(secondDim,firstDim) ).data();
-      // 
-      // Output 
-      //
-      //for (int j=0; j<elems; j++) cout<<j<<" "<<" "<<a[j]<<endl;
-      //
-      // Prepare to do a workspace query 
-      //
-      int lwork=-1;
-      int lwork_=1;
-      complex<double> *work_query= new complex<double> [lwork_];
-      double rwork[(3*n-2)];
-      // 
-      // Workspace query
-      //
-      double w[n];
-      int info_=zheev_(&jobz, &uplo, &n, a, &lda, w, work_query, 
-          &lwork, rwork, &info);
-      // 
-      // Get sizes of the workspace and reallocate
-      //
-      lwork_=(int)abs((work_query[0]).real());
-      //cout<<"after query\n"<<" work_query[0] "<<lwork<<endl;
-      
-      delete[] work_query;
-      complex<double> *work= new complex<double> [lwork_];
-      // 
-      // Call to zheev_
-      //
-      info_=zheev_(&jobz, &uplo, &n, a, &lda, w, work, 
-          &lwork_, rwork, &info);
-      //
-      // Free all
-      //
-      delete[] work;
-      //
-      // Transpose the DM part (a is row ordered)
-      //
-      DMpart.transposeSelf(secondDim,firstDim);
-      // 
-      // Output 
-      //
-      for(int i=0; i<n; i++) EigenVals.push_back(w[i]);
-      // 
-      // Output 
-      //
-      //for (int j=0; j<elems; j++) cout<<j<<" "<<" "<<a[j]<<endl;
-      //for(int i=0; i<EigenVals.size(); i++) cout<<EigenVals[i]<<endl;
-      
-      //cout<<"Info "<<info<<endl;
-};
-/*****************************************************************************/
-///
 /// Function to take a real my_Matrix  and diag it with lapack
 ///
-void diagWithLapack_R(Array<double , 2>& DMpart, 
-vector<double>& EigenVals)
+void diagWithLapack_R(double *a, vector<double>& EigenVals, int &rows_, int &cols_)
 {
-      int rows_=DMpart.rows();
-      int cols_=DMpart.cols();
+      //int rows_=DMpart.size(); //assuming it is square here
+      //int cols_=DMpart.size();
       ///
       /// CLAPACK function to diagonalize an Hermitian matrix
       ///      
@@ -121,12 +46,12 @@ vector<double>& EigenVals)
       //
       // DMPart is hermitian so we use it to get the fortran array
       //
-      double* a;
-      a=( DMpart.transpose(secondDim,firstDim) ).data();
+      //double* a;
+      //a=( DMpart.transpose(secondDim,firstDim) ).data();
       // 
       // Output 
       //
-      //for (int j=0; j<elems; j++) cout<<j<<" "<<" "<<a[j]<<endl;
+      for (int j=0; j<elems; j++) cout<<j<<" "<<" "<<a[j]<<endl;
       //
       // Prepare to do a workspace query 
       //
@@ -142,7 +67,7 @@ vector<double>& EigenVals)
       // 
       // Get sizes of the workspace and reallocate
       //
-      lwork_=(int)abs((work_query[0]));
+      lwork_=(int)fabs((work_query[0]));
       //cout<<"after query\n"<<" work_query[0] "<<lwork<<endl;
       
       delete[] work_query;
@@ -159,7 +84,7 @@ vector<double>& EigenVals)
       //
       // Transpose the DM part (a is row ordered)
       //
-      DMpart.transposeSelf(secondDim,firstDim);
+      //DMpart.transposeSelf(secondDim,firstDim);
       // 
       // Output 
       //
@@ -167,8 +92,8 @@ vector<double>& EigenVals)
       // 
       // Output 
       //
-      //for (int j=0; j<elems; j++) cout<<j<<" "<<" "<<a[j]<<endl;
-      //for(int i=0; i<EigenVals.size(); i++) cout<<EigenVals[i]<<endl;
+      for (int j=0; j<elems; j++) cout<<j<<" "<<" "<<a[j]<<endl;
+      for(int i=0; i<EigenVals.size(); i++) cout<<EigenVals[i]<<endl;
       
-      //cout<<"Info "<<info<<endl;
+      cout<<"Info "<<info<<endl;
 };
