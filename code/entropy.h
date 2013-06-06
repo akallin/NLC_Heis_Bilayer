@@ -199,6 +199,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     // ------ GET ENTROPY!!! ------
     getEE(alpha1, tempEnt, SuperMat);
     for(int a=0; a<alpha1.size(); a++){
+      cout << "line S_" << a+1 << " = " << tempEnt[a] << endl;
       ents[a].second += -(yMax-1)*tempEnt[a];
       if(xSize<(xMax+1)/2){ ents[a].second += -(yMax-1)*tempEnt[a]; }
     }
