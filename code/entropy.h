@@ -54,6 +54,9 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
     Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
     cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
+    //    for(int rr=0; rr<Adim; rr++){ cout << rr << "  " << AbasPos[rr] << endl;}
+    //    cout << "------------\n";
+    //    for(int rr=0; rr<Bdim; rr++){ cout << rr << "  " << BbasPos[rr] << endl;}
 
     // Initialize the matrix of eigenvalues
     SuperMat.resize(Adim);
@@ -137,7 +140,8 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
   ySize = yMax;
   // Iterate over the vectical cuts
   for(int xSize=1; xSize<=xMax/2; xSize++){
-    // Get the dimensions of region A and B;
+ 
+   // Get the dimensions of region A and B;
     Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
     Bdim = regionDim_NA_N(Nsite - xSize*ySize, Nsite, Bbasis, BbasPos);
     cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
@@ -150,12 +154,38 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     for(int i=0; i<Dim; i++){      
       // extractifying the region A and region B states
       tempState = Basis[i];
-      
+
+      /*      cout << "Full : " << tempState << endl;
+      int tempp;
+
+      tempp = tempState;
+      for(int ry=0; ry<16; ry++){
+	  cout << (tempp&1);
+	  tempp = tempp>>1;
+      }
+      cout << endl;
+      for(int ry=0; ry<16; ry++){
+	cout << ((tempState&(1<<ry))>>ry);	 
+      }
+      cout << endl << endl;
+      tempp = tempState;
+      for(int ry=3; ry>=0; ry--){
+	for(int rx=0; rx<4; rx ++){
+	  cout << ((tempState&(1<<RScoords[rx][ry]))>>RScoords[rx][ry]) << " ";
+	  //cout << (tempp&1);
+	  //tempp = tempp>>1;
+	}
+	cout << endl;
+      }
+      cout << endl;
+      */
       // Loop over region A
       aState=0; // Initialize the state in region A
       for(int y=0; y<yMax; y++){
 	for(int x=0; x<xSize; x++){
 
+	  //	  cout << "regionA (" << x << "," << y << ")\n";
+		  
 	  // Figure out the spin number given the x,y coords
 	  tempSpin = RScoords[x][y];
 
@@ -168,15 +198,24 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
 	  // Shift the bits by 1 (for the next site)
 	  aState = aState<<1;
 	}
-      }	
+      }
       // Unshift aState by 1 (because there was one extra)
       aState = aState>>1;
 
-      // Loop over region B (note y starts at ySize)
+      /*      cout << "A: " << aState << endl;
+      tempp = aState;
+      for(int rr=1; rr<5; rr++){
+	cout << (tempp&1);
+	tempp = tempp>>1;
+      }
+      cout << endl;*/
+
+      // Loop over region B (note x starts at xSize)
       bState=0; // Initialize the state in region B
       for(int y=0; y<yMax; y++){
 	for(int x=xSize; x<xMax; x++){
 
+	  //	  cout << "regionB (" << x << "," << y << ")\n";
 	  // Figure out the spin number given the x,y coords
 	  tempSpin = RScoords[x][y];
 
@@ -193,6 +232,15 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
       // Unshift bState by 1 (because there was one extra)
       bState = bState>>1;
 
+      /*      cout << "B: " << bState << endl;
+      tempp = bState;
+      for(int rr=0; rr<12; rr++){
+	cout << (tempp&1);
+	tempp = tempp>>1;
+      }
+      cout << endl;*/
+
+      if(AbasPos[aState]<0 || BbasPos[bState]<0){ cout << "SUPER ERROR!\n"; exit(1);}
       SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
     }
      
@@ -266,6 +314,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
 	// Unshift bState by 1 (because there was one extra)
 	bState = bState>>1;
 	
+      if(AbasPos[aState]<0 || BbasPos[bState]<0){ cout << "SUPER ERROR!\n"; exit(1);}
 	SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
       }
       
@@ -282,7 +331,8 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
 unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vector<long>& basPosm )
 {
   int full_dim = full_hilb(na);
-  basPosm.resize(full_dim,-1);
+  basPosm.clear();
+  basPosm.resize(full_dim,-99);
   unsigned int dimm;
   basism.resize(0);
 
@@ -316,6 +366,8 @@ unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vect
           basPosm.at(i1)=basism.size()-1;
           dimm++;
 	}
+	//	cout << i1 << "  " << basPosm[i1] << endl;
+
       }
   }
 
