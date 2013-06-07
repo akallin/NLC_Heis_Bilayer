@@ -19,7 +19,8 @@ GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vecto
   for (int ch=1; ch<Nsite; ch++) Dim *=2;
 
   //BasPos holds the position of state x (in the vector Basis) in its x^th element
-  BasPos.resize(Dim,-1); //initialization 
+  BasPos.clear();
+  BasPos.resize(Dim,-99); //initialization 
   Vdim=0;
   unsigned long temp;    //create basis
 
