@@ -59,6 +59,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     //    for(int rr=0; rr<Bdim; rr++){ cout << rr << "  " << BbasPos[rr] << endl;}
 
     // Initialize the matrix of eigenvalues
+    SuperMat.clear();
     SuperMat.resize(Adim);
     for(int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
 
@@ -147,6 +148,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
 
     // Initialize the matrix of eigenvalues
+    SuperMat.clear();
     SuperMat.resize(Adim);
     for(int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
   
@@ -263,6 +265,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
       cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;      
 
       // Initialize the matrix of eigenvalues
+      SuperMat.clear();
       SuperMat.resize(Adim);
       for(int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
       
@@ -334,6 +337,7 @@ unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vect
   basPosm.clear();
   basPosm.resize(full_dim,-99);
   unsigned int dimm;
+  basism.clear();
   basism.resize(0);
 
   // If the region is less than or equal to half
