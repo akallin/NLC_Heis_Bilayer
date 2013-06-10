@@ -5,10 +5,12 @@
 void getEE( vector <double>& alpha1, vector <double>& CornLineEnts, vector< vector<long double> >& SuperMat );
 unsigned int full_hilb( unsigned na );
 unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long> &Abasis, vector<long> &AbasPos );
+
+
 		      
 inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< pair<double,double> >& ents, 
-		      vector< vector< int > >& RScoords, vector <long> Basis)
- {
+		      vector< vector< int > >& RScoords, vector <long> Basis){
+  
   // Get the graph dimensions from the realspace coordinates
   int xMax = RScoords.size();
   int yMax = RScoords[0].size();
@@ -36,14 +38,16 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
   for(int a=0; a<ents.size(); a++){
     //line ents
     ents[a].first = 0;
+
     //corner ents
     ents[a].second = 0;
+
     tempEnt[a] = 0;
   }
 
-  // ------ Line Terms!! ------
+  // --------------- Line Terms!! ---------------
   
-  // -*-*-*- Horizontal -*-*-*-
+  // -*-*-*-*-*-*-*- Horizontal -*-*-*-*-*-*-*-
   xSize = xMax;
   // Iterate over the horizontal cuts
   for(int ySize=1; ySize<=yMax/2; ySize++){
@@ -54,9 +58,6 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
     Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
     cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
-    //    for(int rr=0; rr<Adim; rr++){ cout << rr << "  " << AbasPos[rr] << endl;}
-    //    cout << "------------\n";
-    //    for(int rr=0; rr<Bdim; rr++){ cout << rr << "  " << BbasPos[rr] << endl;}
 
     // Initialize the matrix of eigenvalues
     SuperMat.clear();
@@ -109,8 +110,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
       }	
       // Unshift bState by 1 (because there was one extra)
       bState = bState>>1;
-      // CHANGE THIS!!! (if the region has > N/2 sites then its basis needs to be *translated*)
-      //
+
       SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
     }
 
@@ -125,19 +125,11 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
 
     //cout << "Adim " << Adim << "  Bdim " << Bdim << "  Hent=" << getEE(alpha,SuperMat) <<endl;
       
-  
-  // In the future we can just multiply all renyis by 2 except the middle one for an even system.
+    // In the future we can just multiply all renyis by 2 except the middle one for an even system.
   }
 
-  //
-  //
-  //WORKING ABOVE THIS POINT
-  //
-  //
 
-
-
-  // -*-*-*- Vertical -*-*-*-
+  // -*-*-*-*-*-*-*- Vertical -*-*-*-*-*-*-*-*-
   ySize = yMax;
   // Iterate over the vectical cuts
   for(int xSize=1; xSize<=xMax/2; xSize++){
@@ -157,36 +149,10 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
       // extractifying the region A and region B states
       tempState = Basis[i];
 
-      /*      cout << "Full : " << tempState << endl;
-      int tempp;
-
-      tempp = tempState;
-      for(int ry=0; ry<16; ry++){
-	  cout << (tempp&1);
-	  tempp = tempp>>1;
-      }
-      cout << endl;
-      for(int ry=0; ry<16; ry++){
-	cout << ((tempState&(1<<ry))>>ry);	 
-      }
-      cout << endl << endl;
-      tempp = tempState;
-      for(int ry=3; ry>=0; ry--){
-	for(int rx=0; rx<4; rx ++){
-	  cout << ((tempState&(1<<RScoords[rx][ry]))>>RScoords[rx][ry]) << " ";
-	  //cout << (tempp&1);
-	  //tempp = tempp>>1;
-	}
-	cout << endl;
-      }
-      cout << endl;
-      */
       // Loop over region A
       aState=0; // Initialize the state in region A
       for(int y=0; y<yMax; y++){
 	for(int x=0; x<xSize; x++){
-
-	  //	  cout << "regionA (" << x << "," << y << ")\n";
 		  
 	  // Figure out the spin number given the x,y coords
 	  tempSpin = RScoords[x][y];
@@ -203,14 +169,6 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
       }
       // Unshift aState by 1 (because there was one extra)
       aState = aState>>1;
-
-      /*      cout << "A: " << aState << endl;
-      tempp = aState;
-      for(int rr=1; rr<5; rr++){
-	cout << (tempp&1);
-	tempp = tempp>>1;
-      }
-      cout << endl;*/
 
       // Loop over region B (note x starts at xSize)
       bState=0; // Initialize the state in region B
@@ -233,14 +191,6 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
       }	
       // Unshift bState by 1 (because there was one extra)
       bState = bState>>1;
-
-      /*      cout << "B: " << bState << endl;
-      tempp = bState;
-      for(int rr=0; rr<12; rr++){
-	cout << (tempp&1);
-	tempp = tempp>>1;
-      }
-      cout << endl;*/
 
       if(AbasPos[aState]<0 || BbasPos[bState]<0){ cout << "SUPER ERROR!\n"; exit(1);}
       SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
@@ -326,11 +276,18 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
       for(int a=0; a<alpha1.size(); a++){
 	ents[a].second += 2.*tempEnt[a];
 	cout << "corner S_" << a+1 << " = " << tempEnt[a] << endl;
-      }
-    }
-  }
+      }//loop over alphas
+    }//loop over xSize
+  }//loop over ySize
 }
+//End of Entropy2D
 
+
+/* -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+|  regionDim_NA_N - Gives the dimension of the Hilbert space for some region A given:             |
+|  *  na - the number of sites in A                                                               |
+|  *  n  - the total number of sites                                                              |
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*- */
 unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vector<long>& basPosm )
 {
   int full_dim = full_hilb(na);
@@ -340,9 +297,9 @@ unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vect
   basism.clear();
   basism.resize(0);
 
-  // If the region is less than or equal to half
-  // of the total number of sites (we have a full 
-  // unrestricted basis) Dim = 2^na
+  /* If the region is less than or equal to half  |
+  |  of the total number of sites (we have a full |
+  |  unrestricted basis) Dim = 2^na              */
   if (na<=n/2){
     dimm = full_dim;	
     for (unsigned long i1=0; i1<full_dim; i1++) 
@@ -352,7 +309,6 @@ unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vect
 	basPosm.at(i1)=basism.size()-1;
       }
   }
-
 
   // Otherwise Dim is more complicated!
   else{
@@ -374,18 +330,23 @@ unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vect
 
       }
   }
-
-
   return dimm;
-}
+}//End of regionDim_NA_N
 
-// Just does 2^na
+
+/* -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+ full_hilb - calculates 2^na given na
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*- */
 unsigned int full_hilb( unsigned na ){
   unsigned int result = 1;
   for(int i=0; i<na; i++) result *=2;
   return result;
-}
+}//End of full_hilb
 
+
+/* -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+   getEE
+-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*- */
 void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vector<long double> >& SuperMat ){
   // The Density Matrix
   //Array <double,2> DM;
@@ -473,6 +434,6 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
     
     CornLineEnts[a] = EE;
   }
-}
+}//End of getEE
 
 #endif
