@@ -83,5 +83,5 @@ void diagWithLapack_R(double *a, vector<double>& EigenVals, int &rows_, int &col
       //for (int j=0; j<elems; j++) cout<<j<<" "<<" "<<a[j]<<endl;
       //for(int i=0; i<EigenVals.size(); i++) cout<<EigenVals[i]<<endl;
       
-      cout<<"Info "<<info<<endl;
+      //cout<<"Info "<<info<<endl;
 };

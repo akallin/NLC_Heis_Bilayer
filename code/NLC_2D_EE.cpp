@@ -32,9 +32,8 @@ int main(int argc, char** argv){
   int CurrentArg = 1;
   string InputFile;
   string OutputFile = "output_2d.dat";
-  bool LF = false;
   double alpha = 0;
-  // flags to set the input file (need to do that), output file (not used), and low field
+  // flags to set the input file (need to do that), and output file (not used)
   while (CurrentArg < argc)
     {
       if (argv[ CurrentArg ] == string("-i") || argv[ CurrentArg ] == string("--input"))
@@ -45,10 +44,6 @@ int main(int argc, char** argv){
         {
 	  OutputFile = string(argv[ CurrentArg + 1 ]);
         }
-      if (argv[ CurrentArg ] == string("-LF") || argv[ CurrentArg ] == string("--lowfield"))
-	{
-	  LF = true;
-	}
       if (argv [ CurrentArg ] == string("-s") || argv[ CurrentArg ] == string("-S"))
 	{
 	  alpha = atof( argv [ CurrentArg + 1]);
@@ -218,13 +213,7 @@ int main(int argc, char** argv){
 	      << " Corn=" << setw(17) << RunningSumCornerEntropy[a] << endl;
       }
       cout << endl;
-      /*
-      if(LF){ 
-      ofstream magOut(magFile.c_str());
-      magOut << abs(RunningSumMagnetization);
-      magOut.close();
-      }
-      */
+
       WeightEnergy.clear();
       // WeightMagnetization.clear();
       RunningSumEnergy=0;
