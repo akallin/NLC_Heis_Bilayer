@@ -33,7 +33,8 @@ int main(int argc, char** argv){
   string InputFile;
   string OutputFile = "output_2d.dat";
   double alpha = 0;
-  // flags to set the input file (need to do that), and output file (not used)
+
+  // flags to set the input file (need to do that), output file (not used), and the Renyi S to be measured
   while (CurrentArg < argc)
     {
       if (argv[ CurrentArg ] == string("-i") || argv[ CurrentArg ] == string("--input"))
@@ -55,10 +56,10 @@ int main(int argc, char** argv){
 
     PARAMS prm;  //Read parameters from param.dat  : see simparam.h
     double J;
-    double h;
+    double Jperp;
 
     J=prm.JJ_;
-    h=prm.hh_;
+    Jperp=prm.hh_;
 
     //eigenvector
     vector<l_double> eVec;
@@ -86,16 +87,16 @@ int main(int argc, char** argv){
     
     J=1;     
 
-    const int numhVals = 62;
+    const int numJperpVals = 62;
     //28 values
-     double hvals[numhVals] = {0.2,0.3,0.4,0.5,0.6,0.7,0.800001,0.9,1.0,
-				1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,
-				2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,2.95,3.0,
-				3.044,3.05,3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,
-				4.1,4.2,4.3,4.4,4.5,4.6,4.7,4.8,4.9,5.0,
-				5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10};
-     //   double hvals[numhVals] = {3.044};
-
+    double Jperpvals[numJperpVals] = {0.2,0.3,0.4,0.5,0.6,0.7,0.800001,0.9,1.0,
+				  1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,
+				  2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,2.95,3.0,
+				  3.044,3.05,3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,
+				  4.1,4.2,4.3,4.4,4.5,4.6,4.7,4.8,4.9,5.0,
+				  5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10};
+    //   double Jperpvals[numhVals] = {3.044};
+    
     // The Renyi entropies to measure (if it's not set in commandline)
     vector <double> alphas;
     if(alpha==0){
@@ -104,7 +105,7 @@ int main(int argc, char** argv){
       }
     }
     else{alphas.push_back(alpha);}
-
+    
     //now that we know the # of renyis, resize entropy vectors
     int numRenyis = alphas.size();
     RunningSumLineEntropy.resize(numRenyis);
@@ -112,19 +113,21 @@ int main(int argc, char** argv){
     WeightLineEntropy.resize(numRenyis);
     WeightCornerEntropy.resize(numRenyis);
     entVec.resize(numRenyis);
-
-    //   for(int hh=0; hh<numhVals; hh++){
-    for(int hh=0; hh<1; hh++){
+    
+    // Loop Over All Values of Jperp -----------------
+    //   for(int Jp=0; Jp<numJperpVals; hh++){
+    for(int Jp=0; Jp<1; Jp++){
       entVec.clear();
       entVec.resize(numRenyis);
 
-      h = hvals[hh];
+      Jperp = Jperpvals[Jp];
 
-      //One Site Graph
+      //------------ One Site Graph ----------------
       // WeightEnergy.push_back(-h); //Energy weight for zero graph (one site)
       WeightEnergy.push_back(0);
       // WeightMagnetization.push_back(0);  
-      //Loop through entropies
+
+      //------------ Loop through entropies -------- 
       for(int a=0; a<numRenyis; a++){
 	WeightLineEntropy[a].push_back(0);
 	WeightCornerEntropy[a].push_back(0);
@@ -137,7 +140,7 @@ int main(int argc, char** argv){
 	RunningSumCornerEntropy[a] = WeightCornerEntropy[a].back();
       }
       
-      //Two Site Graph
+      //------------ Two Site Graph ----------------
       //WeightEnergy.push_back(-sqrt(1+4*h*h)+2*h);
       //WeightEntropy.push_back(TwoSiteEntropy(h,alpha));
       //End of 2 site system stuff!!
@@ -145,20 +148,18 @@ int main(int argc, char** argv){
       //RunningSumEnergy+=WeightEnergy.back();
       //RunningSumEntropy+=WeightEntropy.back();
 
-      //All the *real* graphs
+      //------------ All the *real* graphs-----------
       // Changed this to i=0 instead of i=1 to test
-
-    
       for (int i=0; i<fileGraphs.size(); i++){ //skip the zeroth graph
   	
 	//---Generate the Hamiltonian---
-	GENHAM HV(fileGraphs.at(i).NumberSites,J,h,fileGraphs.at(i).AdjacencyList); 
+	GENHAM HV(fileGraphs.at(i).NumberSites,J,Jperp,fileGraphs.at(i).AdjacencyList); 
 	
 	LANCZOS lancz(HV.Vdim);  //dimension of Hilbert space
 	HV.SparseHamJQ();  //generates sparse matrix Hamiltonian for Lanczos
 
 	
-	//---Diagonalize and get Eigenvector---
+	//---------- Diagonalize and get Eigenvector -------
 	energy = lancz.Diag(HV, 1, prm.valvec_, eVec); // Hamiltonian, # of eigenvalues to converge, 1 for -values only, 2 for vals AND vectors
 	cout << " ENERGY = " << energy << endl;
 	//cout << "Graph " << i <<" energy: " << energy << endl;
@@ -166,10 +167,9 @@ int main(int argc, char** argv){
 	//	return 1;
 	
 
-	//---Energy/Entropy NLC Calculation---
+	//---------- Energy/Entropy NLC Calculation --------
 	WeightEnergy.push_back(energy);
 	//Entropy1D(alpha, eVec, entVec, mag);
-
 	Entropy2D(alphas, eVec, entVec, fileGraphs.at(i).RealSpaceCoordinates, HV.Basis);
 
 	//Loop Here!!!  ALSO MAKE NOTE THAT LINE IS FIRST AND CORNER IS SECOND !_!_!_!_!_!_!_!_!_!_!_!_!_!
@@ -208,7 +208,7 @@ int main(int argc, char** argv){
      
       for(int a=0; a<alphas.size(); a++){ 
 	//	 cout << "h= " << setw(6) << h << " Ener= "<<setw(15)<<RunningSumEnergy<< " Mag= " << setw(15) << RunningSumMagnetization  
-	   cout << "h= " << setw(6) << h << " Ener= "<<setw(15)<<RunningSumEnergy<< "   " 
+	   cout << "Jp= " << setw(6) << Jperp << " Ener= "<<setw(15)<<RunningSumEnergy<< "   " 
 	      << "  S_ " << setw (5) << alphas[a] << "  Line= "<< setw(16) << RunningSumLineEntropy[a] 
 	      << " Corn=" << setw(17) << RunningSumCornerEntropy[a] << endl;
       }
@@ -217,7 +217,7 @@ int main(int argc, char** argv){
       WeightEnergy.clear();
       // WeightMagnetization.clear();
       RunningSumEnergy=0;
-      //     RunningSumMagnetization=0;
+      // RunningSumMagnetization=0;
 
       for(int a=0; a<numRenyis; a++){
 	WeightLineEntropy[a].clear();
