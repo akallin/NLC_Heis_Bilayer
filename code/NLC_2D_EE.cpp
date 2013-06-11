@@ -190,12 +190,8 @@ int main(int argc, char** argv){
 	    WeightCornerEntropy[a].back() -= fileGraphs.at(i).SubgraphList[j].second * WeightCornerEntropy[a][fileGraphs.at(i).SubgraphList[j].first];
 	  }	  
 	}
-
-	// cout<<"h="<<h<<" J="<<J<<" graph #"<<i<<" energy "<<setprecision(12)<<energy<<endl;
-	// cout<<"WeightHigh["<<i<<"] = "<<WeightHigh.back()<<endl;
 	
 	RunningSumEnergy += WeightEnergy.back()*fileGraphs.at(i).LatticeConstant;
-	
 	//	RunningSumMagnetization += WeightMagnetization.back()*fileGraphs.at(i).LatticeConstant;
 	
 	for(int a=0; a<numRenyis; a++){
@@ -203,9 +199,9 @@ int main(int argc, char** argv){
 	  RunningSumCornerEntropy[a] += WeightCornerEntropy[a].back()*fileGraphs.at(i).LatticeConstant;
 	}
 	
-	if(fileGraphs.size()-1 > i){ if(fileGraphs.at(i).NumberSites != fileGraphs.at(i+1).NumberSites){
-	    cout <<"Order " <<fileGraphs.at(i).NumberSites << " RunningSumEnergy " << i <<" "
-		 << RunningSumEnergy << " LineEntropy_2= " << RunningSumLineEntropy[1] << endl;}
+	if(fileGraphs.size()-1 > i){ if(fileGraphs.at(i).NumberSites != fileGraphs.at(i+1).NumberSites){ 
+	    cout <<"Order " <<setw(3)<< fileGraphs.at(i).NumberSites << "    RunningSumEnergy="
+		 <<setw(15)<< RunningSumEnergy << "    LineEntropy_2= " << setw(15) << RunningSumLineEntropy[1] << endl;}
 	}
 	//  << " Magnetization= " << RunningSumMagnetization << endl;
       }
