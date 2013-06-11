@@ -87,14 +87,9 @@ int main(int argc, char** argv){
     
     J=1;     
 
-    const int numJperpVals = 62;
+    const int numJperpVals = 1;
     //28 values
-    double Jperpvals[numJperpVals] = {0.2,0.3,0.4,0.5,0.6,0.7,0.800001,0.9,1.0,
-				  1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,
-				  2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,2.95,3.0,
-				  3.044,3.05,3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4.0,
-				  4.1,4.2,4.3,4.4,4.5,4.6,4.7,4.8,4.9,5.0,
-				  5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10};
+    double Jperpvals[numJperpVals] = {1};
     //   double Jperpvals[numhVals] = {3.044};
     
     // The Renyi entropies to measure (if it's not set in commandline)
@@ -115,30 +110,30 @@ int main(int argc, char** argv){
     entVec.resize(numRenyis);
     
     // Loop Over All Values of Jperp -----------------
-    //   for(int Jp=0; Jp<numJperpVals; hh++){
-    for(int Jp=0; Jp<1; Jp++){
+    for(int Jp=0; Jp<numJperpVals; Jp++){
       entVec.clear();
       entVec.resize(numRenyis);
-
+      
       Jperp = Jperpvals[Jp];
-
+      
       //------------ One Site Graph ----------------
+      //  Doesn't exist for Heisenberg!
       // WeightEnergy.push_back(-h); //Energy weight for zero graph (one site)
-      WeightEnergy.push_back(0);
+      // WeightEnergy.push_back(0);
       // WeightMagnetization.push_back(0);  
 
       //------------ Loop through entropies -------- 
-      for(int a=0; a<numRenyis; a++){
-	WeightLineEntropy[a].push_back(0);
-	WeightCornerEntropy[a].push_back(0);
-      }//TEST THIS TO MAKE SURE WE'RE NOT GETTING 2 ZEROS OR SOMETHING !!!___!_!_!_!_!_!_!_!
+      //for(int a=0; a<numRenyis; a++){
+      //	WeightLineEntropy[a].push_back(0);
+      //	WeightCornerEntropy[a].push_back(0);
+      //}//TEST THIS TO MAKE SURE WE'RE NOT GETTING 2 ZEROS OR SOMETHING !!!___!_!_!_!_!_!_!_!
 
-      RunningSumEnergy = WeightEnergy.back();      
+      //RunningSumEnergy = WeightEnergy.back();      
       //RunningSumMagnetization = WeightMagnetization.back();
-      for(int a=0; a<numRenyis; a++){
-	RunningSumLineEntropy[a] = WeightLineEntropy[a].back();
-	RunningSumCornerEntropy[a] = WeightCornerEntropy[a].back();
-      }
+      //      for(int a=0; a<numRenyis; a++){
+      //	RunningSumLineEntropy[a] = WeightLineEntropy[a].back();
+      //	RunningSumCornerEntropy[a] = WeightCornerEntropy[a].back();
+      //      }
       
       //------------ Two Site Graph ----------------
       //WeightEnergy.push_back(-sqrt(1+4*h*h)+2*h);
@@ -149,29 +144,36 @@ int main(int argc, char** argv){
       //RunningSumEntropy+=WeightEntropy.back();
 
       //------------ All the *real* graphs-----------
-      // Changed this to i=0 instead of i=1 to test
-      for (int i=0; i<fileGraphs.size(); i++){ //skip the zeroth graph
+      for (int i=0; i<fileGraphs.size(); i++){
   	
-	//---Generate the Hamiltonian---
-	GENHAM HV(fileGraphs.at(i).NumberSites,J,Jperp,fileGraphs.at(i).AdjacencyList); 
-	
-	LANCZOS lancz(HV.Vdim);  //dimension of Hilbert space
-	HV.SparseHamJQ();  //generates sparse matrix Hamiltonian for Lanczos
+	if(fileGraphs.at(i).NumberSites==2){
+	  
+	  energy = -0.75*J;
+	  for(int a=0; a<numRenyis; a++){
+	    entVec[a].first=log(2.0);  //check these values
+	    entVec[a].second=0;        //check 'em
+	  }
+	}
 
+	else{
+	  //---Generate the Hamiltonian---
+	  GENHAM HV(fileGraphs.at(i).NumberSites,J,Jperp,fileGraphs.at(i).AdjacencyList); 
 	
-	//---------- Diagonalize and get Eigenvector -------
-	energy = lancz.Diag(HV, 1, prm.valvec_, eVec); // Hamiltonian, # of eigenvalues to converge, 1 for -values only, 2 for vals AND vectors
-	cout << " ENERGY = " << energy << endl;
-	//cout << "Graph " << i <<" energy: " << energy << endl;
+	  LANCZOS lancz(HV.Vdim);  //dimension of Hilbert space
+	  HV.SparseHamJQ();  //generates sparse matrix Hamiltonian for Lanczos
 
-	//	return 1;
-	
+	  //---------- Diagonalize and get Eigenvector -------
+	  energy = lancz.Diag(HV, 1, prm.valvec_, eVec); // Hamiltonian, # of eigenvalues to converge, 1 for -values only, 2 for vals AND vectors
+	  //cout << "\n ENERGY = " << energy << endl;
+	  //cout << "Graph " << i <<" energy: " << energy << endl;
+	  Entropy2D(alphas, eVec, entVec, fileGraphs.at(i).RealSpaceCoordinates, HV.Basis);
+
+	}
 
 	//---------- Energy/Entropy NLC Calculation --------
 	WeightEnergy.push_back(energy);
 	//Entropy1D(alpha, eVec, entVec, mag);
-	Entropy2D(alphas, eVec, entVec, fileGraphs.at(i).RealSpaceCoordinates, HV.Basis);
-
+	
 	//Loop Here!!!  ALSO MAKE NOTE THAT LINE IS FIRST AND CORNER IS SECOND !_!_!_!_!_!_!_!_!_!_!_!_!_!
 	for(int a=0; a<numRenyis; a++){
 	  WeightLineEntropy[a].push_back(entVec[a].first);
@@ -191,13 +193,20 @@ int main(int argc, char** argv){
 
 	// cout<<"h="<<h<<" J="<<J<<" graph #"<<i<<" energy "<<setprecision(12)<<energy<<endl;
 	// cout<<"WeightHigh["<<i<<"] = "<<WeightHigh.back()<<endl;
+	
 	RunningSumEnergy += WeightEnergy.back()*fileGraphs.at(i).LatticeConstant;
+	
 	//	RunningSumMagnetization += WeightMagnetization.back()*fileGraphs.at(i).LatticeConstant;
+	
 	for(int a=0; a<numRenyis; a++){
 	  RunningSumLineEntropy[a] += WeightLineEntropy[a].back()*fileGraphs.at(i).LatticeConstant;
 	  RunningSumCornerEntropy[a] += WeightCornerEntropy[a].back()*fileGraphs.at(i).LatticeConstant;
 	}
-	//	cout <<"S_ " <<alpha <<" h= "<< h<< " RunningSumEnergy " << i <<" "<< RunningSumEnergy << " Entropy= " << RunningSumEntropy 
+	
+	if(fileGraphs.size()-1 > i){ if(fileGraphs.at(i).NumberSites != fileGraphs.at(i+1).NumberSites){
+	    cout <<"Order " <<fileGraphs.at(i).NumberSites << " RunningSumEnergy " << i <<" "
+		 << RunningSumEnergy << " LineEntropy_2= " << RunningSumLineEntropy[1] << endl;}
+	}
 	//  << " Magnetization= " << RunningSumMagnetization << endl;
       }
       

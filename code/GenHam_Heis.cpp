@@ -40,7 +40,7 @@ GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vecto
   }//Dim
 
   //output the total and reduced Hilbert Space dimension
-  cout<<"Vdim "<<Vdim<<" "<<Dim<<endl;
+  //cout<<"Vdim "<<Vdim<<" "<<Dim<<endl;
 
 }//constructor
 

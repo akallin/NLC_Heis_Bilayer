@@ -57,7 +57,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     // if NA > N/2 or NB > N/2
     Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
     Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
-    cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
+    //cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
 
     // Initialize the matrix of eigenvalues
     SuperMat.clear();
@@ -118,7 +118,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     getEE(alpha1, tempEnt, SuperMat);
     for(int a=0; a<alpha1.size(); a++){
       ents[a].first += tempEnt[a];
-      cout << "line S_" << a+1 << " = " << tempEnt[a] << endl;
+      //cout << "line S_" << a+1 << " = " << tempEnt[a] << endl;
       ents[a].second += -(xMax-1)*tempEnt[a];
       if(ySize<(yMax+1)/2){ents[a].first += tempEnt[a];  ents[a].second += -(xMax-1)*tempEnt[a];}
     }
@@ -137,7 +137,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
    // Get the dimensions of region A and B;
     Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
     Bdim = regionDim_NA_N(Nsite - xSize*ySize, Nsite, Bbasis, BbasPos);
-    cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
+    //cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
 
     // Initialize the matrix of eigenvalues
     SuperMat.clear();
@@ -199,7 +199,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     // ------ GET ENTROPY!!! ------
     getEE(alpha1, tempEnt, SuperMat);
     for(int a=0; a<alpha1.size(); a++){
-      cout << "line S_" << a+1 << " = " << tempEnt[a] << endl;
+      //cout << "line S_" << a+1 << " = " << tempEnt[a] << endl;
       ents[a].second += -(yMax-1)*tempEnt[a];
       if(xSize<(xMax+1)/2){ ents[a].second += -(yMax-1)*tempEnt[a]; }
     }
@@ -212,7 +212,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
       // Get the dimensions of region A and B;
       Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
       Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
-      cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;      
+      //cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;      
 
       // Initialize the matrix of eigenvalues
       SuperMat.clear();
@@ -275,7 +275,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
       getEE(alpha1, tempEnt, SuperMat);
       for(int a=0; a<alpha1.size(); a++){
 	ents[a].second += 2.*tempEnt[a];
-	cout << "corner S_" << a+1 << " = " << tempEnt[a] << endl;
+	//cout << "corner S_" << a+1 << " = " << tempEnt[a] << endl;
       }//loop over alphas
     }//loop over xSize
   }//loop over ySize
