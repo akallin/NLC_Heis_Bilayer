@@ -146,12 +146,21 @@ int main(int argc, char** argv){
       //------------ All the *real* graphs-----------
       for (int i=0; i<fileGraphs.size(); i++){
   	
-	if(fileGraphs.at(i).NumberSites==2){
+	if(fileGraphs.at(i).NumberSites<=2){
 	  
-	  energy = -0.75*J;
-	  for(int a=0; a<numRenyis; a++){
-	    entVec[a].first=log(2.0);  //check these values
-	    entVec[a].second=0;        //check 'em
+	  if(fileGraphs.at(i).NumberSites==1){
+	    energy=0;
+	    for(int a=0; a<numRenyis; a++){
+	      entVec[a].first=0;
+	      entVec[a].second=0;
+	    }
+	  }
+	  else{
+	    energy = -0.75*J;
+	    for(int a=0; a<numRenyis; a++){
+	      entVec[a].first=log(2.0);  //check these values
+	      entVec[a].second=0;        //check 'em
+	    }
 	  }
 	}
 
@@ -179,7 +188,8 @@ int main(int argc, char** argv){
 	  WeightLineEntropy[a].push_back(entVec[a].first);
 	  WeightCornerEntropy[a].push_back(entVec[a].second);
 	}
-
+	
+	cout<<"Energy " <<i<<" = "<<WeightEnergy.back()<<endl;
 	//cout<<"Entropy "<<i<<" = "<<WeightEntropy.back()<<endl;
 
 	for (int j = 0; j<fileGraphs.at(i).SubgraphList.size(); j++){
