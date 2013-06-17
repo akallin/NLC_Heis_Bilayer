@@ -321,7 +321,7 @@ unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vect
           temp += (i1>>sp)&1;  //unpack bra & count the up spins
 
 	//can't have more than N/2 up spins or down spins
-	if (temp<=(n/2) && temp>=(na-n/2) ){ 
+	if (temp<=((n+1)/2) && temp>=(na-(n+1)/2) ){ 
           basism.push_back(i1);
           basPosm.at(i1)=basism.size()-1;
           dimm++;

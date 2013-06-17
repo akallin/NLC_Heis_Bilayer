@@ -31,7 +31,7 @@ GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vecto
           temp += (i1>>sp)&1;  //unpack bra & count the up spins
 
       //Specifically targe the Sz=0 sector: HAMILTONIAN MUST CONSERV Sz
-      if (temp==(Nsite/2) ){ 
+      if (temp==((Nsite+1)/2) ){  //Integer division! Gives Sz=-1/2 sector for odd # of spins  
           Basis.push_back(i1);
           BasPos.at(i1)=Basis.size()-1;
           Vdim++;

@@ -146,7 +146,7 @@ int main(int argc, char** argv){
       //------------ All the *real* graphs-----------
       for (int i=0; i<fileGraphs.size(); i++){
   	
-	if(fileGraphs.at(i).NumberSites<=2){
+	if(fileGraphs.at(i).NumberSites<=3){
 	  
 	  if(fileGraphs.at(i).NumberSites==1){
 	    energy=0;
@@ -155,11 +155,18 @@ int main(int argc, char** argv){
 	      entVec[a].second=0;
 	    }
 	  }
-	  else{
+	  else if(fileGraphs.at(i).NumberSites==2){
 	    energy = -0.75*J;
 	    for(int a=0; a<numRenyis; a++){
 	      entVec[a].first=log(2.0);  //check these values
 	      entVec[a].second=0;        //check 'em
+	    }
+	  }
+	  else{
+	    energy = -1.0*J;
+	    for(int a=0; a<numRenyis; a++){
+	      entVec[a].first=2*log(2.0); //check!!!
+	      entVec[a].second=0;
 	    }
 	  }
 	}
