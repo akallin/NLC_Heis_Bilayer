@@ -199,7 +199,7 @@ int main(int argc, char** argv){
 	  WeightCornerEntropy[a].push_back(entVec[a].second);
 	}
 	
-	cout<<"Energy " <<i<<" = "<<WeightEnergy.back()<<endl;
+	//cout<<"Energy " <<i<<" = "<<WeightEnergy.back()<<endl;
 	//cout<<"Entropy "<<i<<" = "<<WeightEntropy.back()<<endl;
 
 	for (int j = 0; j<fileGraphs.at(i).SubgraphList.size(); j++){
@@ -221,7 +221,7 @@ int main(int argc, char** argv){
 	
 	if(fileGraphs.size()-1 > i){ if(fileGraphs.at(i).NumberSites != fileGraphs.at(i+1).NumberSites){ 
 	    cout <<"Order " <<setw(3)<< fileGraphs.at(i).NumberSites << "    RunningSumEnergy="
-		 <<setw(15)<< RunningSumEnergy << "    LineEntropy_2= " << setw(15) << RunningSumLineEntropy[1] << endl;}
+		 <<setw(15)<< RunningSumEnergy << "    LineEnt_1= " << setw(15) << RunningSumLineEntropy[0] <<  "    LineEnt_2= " << setw(15) << RunningSumLineEntropy[1] <<  "    LineEnt_3= " << setw(15) << RunningSumLineEntropy[2] << endl;}
 	}
 	//  << " Magnetization= " << RunningSumMagnetization << endl;
       }
