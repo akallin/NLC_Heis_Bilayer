@@ -168,7 +168,7 @@ int main(int argc, char** argv){
 	    double eig2(1./6.);
 	    for(int a=0; a<numRenyis; a++){
 	      if(fabs(1.0-(alphas[a]))<0.000001){entVec[a].first=2.*(-eig1*log(eig1)-eig2*log(eig2));}
-	      else{entVec[a].first=-(2./(1.-alphas[a]))*log(pow(eig1,alphas[a])+pow(eig2,alphas[a]));}//check!!!
+	      else{entVec[a].first=(2./(1.-alphas[a]))*log(pow(eig1,alphas[a])+pow(eig2,alphas[a]));}
 	      entVec[a].second=0;
 	    }
 	  }
