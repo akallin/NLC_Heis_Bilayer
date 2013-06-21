@@ -5,9 +5,7 @@
 void getEE( vector <double>& alpha1, vector <double>& CornLineEnts, vector< vector<long double> >& SuperMat );
 unsigned int full_hilb( unsigned na );
 unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long> &Abasis, vector<long> &AbasPos );
-
-
-		      
+		    
 inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< pair<double,double> >& ents, 
 		      vector< vector< int > >& RScoords, vector <long> Basis){
   
@@ -118,14 +116,9 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     getEE(alpha1, tempEnt, SuperMat);
     for(int a=0; a<alpha1.size(); a++){
       ents[a].first += tempEnt[a];
-      //cout << "line S_" << a+1 << " = " << tempEnt[a] << endl;
       ents[a].second += -(xMax-1)*tempEnt[a];
       if(ySize<(yMax+1)/2){ents[a].first += tempEnt[a];  ents[a].second += -(xMax-1)*tempEnt[a];}
     }
-
-    //cout << "Adim " << Adim << "  Bdim " << Bdim << "  Hent=" << getEE(alpha,SuperMat) <<endl;
-      
-    // In the future we can just multiply all renyis by 2 except the middle one for an even system.
   }
 
 
@@ -199,7 +192,6 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     // ------ GET ENTROPY!!! ------
     getEE(alpha1, tempEnt, SuperMat);
     for(int a=0; a<alpha1.size(); a++){
-      //cout << "line S_" << a+1 << " = " << tempEnt[a] << endl;
       ents[a].second += -(yMax-1)*tempEnt[a];
       if(xSize<(xMax+1)/2){ ents[a].second += -(yMax-1)*tempEnt[a]; }
     }
@@ -212,7 +204,6 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
       // Get the dimensions of region A and B;
       Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
       Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
-      //cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;      
 
       // Initialize the matrix of eigenvalues
       SuperMat.clear();
@@ -275,7 +266,6 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
       getEE(alpha1, tempEnt, SuperMat);
       for(int a=0; a<alpha1.size(); a++){
 	ents[a].second += 2.*tempEnt[a];
-	//cout << "corner S_" << a+1 << " = " << tempEnt[a] << endl;
       }//loop over alphas
     }//loop over xSize
   }//loop over ySize
@@ -326,8 +316,6 @@ unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vect
           basPosm.at(i1)=basism.size()-1;
           dimm++;
 	}
-	//	cout << i1 << "  " << basPosm[i1] << endl;
-
       }
   }
   return dimm;

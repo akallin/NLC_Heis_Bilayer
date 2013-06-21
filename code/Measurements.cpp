@@ -71,12 +71,8 @@ int main(int argc, char** argv){
     vector< graph > fileGraphs; //graph objects
     
     // List of weights for the different graphs
-    vector<double> WeightEnergy; // WeightMagnetization;
-    vector< vector<double> > WeightLineEntropy, WeightCornerEntropy;
-
-    // Running sum of "the property"
-    double RunningSumEnergy(0);// RunningSumMagnetization(0);
-    vector<double> RunningSumLineEntropy, RunningSumCornerEntropy;
+    double WeightEnergy; // WeightMagnetization;
+    vector<double> WeightLineEntropy, WeightCornerEntropy;
 
     // Self explanatory (good naming convention, Katie)
     ReadGraphsFromFile(fileGraphs, InputFile);
@@ -101,8 +97,6 @@ int main(int argc, char** argv){
     
     //now that we know the # of renyis, resize entropy vectors
     int numRenyis = alphas.size();
-    RunningSumLineEntropy.resize(numRenyis);
-    RunningSumCornerEntropy.resize(numRenyis);
     WeightLineEntropy.resize(numRenyis);
     WeightCornerEntropy.resize(numRenyis);
     entVec.resize(numRenyis);
@@ -155,66 +149,61 @@ int main(int argc, char** argv){
 
 	  //---------- Diagonalize and get Eigenvector -------
 	  energy = lancz.Diag(HV, 1, prm.valvec_, eVec); // Hamiltonian, # of eigenvalues to converge, 1 for -values only, 2 for vals AND vectors
-	  //cout << "\n ENERGY = " << energy << endl;
-	  //cout << "Graph " << i <<" energy: " << energy << endl;
 	  Entropy2D(alphas, eVec, entVec, fileGraphs.at(i).RealSpaceCoordinates, HV.Basis);
 
 	}
 
 	//---------- Energy/Entropy NLC Calculation --------
-	WeightEnergy.push_back(energy);
+	WeightEnergy=energy;
 	
 	//Loop Here!!!  ALSO MAKE NOTE THAT LINE IS FIRST AND CORNER IS SECOND !_!_!_!_!_!_!_!_!_!_!_!_!_!
 	for(int a=0; a<numRenyis; a++){
-	  WeightLineEntropy[a].push_back(entVec[a].first);
-	  WeightCornerEntropy[a].push_back(entVec[a].second);
+	  WeightLineEntropy[a] = entVec[a].first;
+	  WeightCornerEntropy[a] = entVec[a].second;
 	}
 	
-
-
-	for (int j = 0; j<fileGraphs.at(i).SubgraphList.size(); j++){
+	/*
+	  for (int j = 0; j<fileGraphs.at(i).SubgraphList.size(); j++){
 	  WeightEnergy.back() -= fileGraphs.at(i).SubgraphList[j].second * WeightEnergy[fileGraphs.at(i).SubgraphList[j].first];
-
+	  
 	  for(int a=0; a<numRenyis; a++){
-	    WeightLineEntropy[a].back() -= fileGraphs.at(i).SubgraphList[j].second * WeightLineEntropy[a][fileGraphs.at(i).SubgraphList[j].first];
-	    WeightCornerEntropy[a].back() -= fileGraphs.at(i).SubgraphList[j].second * WeightCornerEntropy[a][fileGraphs.at(i).SubgraphList[j].first];
+	  WeightLineEntropy[a].back() -= fileGraphs.at(i).SubgraphList[j].second * WeightLineEntropy[a][fileGraphs.at(i).SubgraphList[j].first];
+	  WeightCornerEntropy[a].back() -= fileGraphs.at(i).SubgraphList[j].second * WeightCornerEntropy[a][fileGraphs.at(i).SubgraphList[j].first];
 	  }	  
-	}
-	
-	RunningSumEnergy += WeightEnergy.back()*fileGraphs.at(i).LatticeConstant;
-	
-	for(int a=0; a<numRenyis; a++){
-	  RunningSumLineEntropy[a] += WeightLineEntropy[a].back()*fileGraphs.at(i).LatticeConstant;
-	  RunningSumCornerEntropy[a] += WeightCornerEntropy[a].back()*fileGraphs.at(i).LatticeConstant;
-	}
-	
-	if(fileGraphs.size()-1 > i){ if(fileGraphs.at(i).NumberSites != fileGraphs.at(i+1).NumberSites){ 
-	    cout <<"Order " <<setw(3)<< fileGraphs.at(i).NumberSites << "    RunningSumEnergy="
-		 <<setw(15)<< RunningSumEnergy << "    LineEnt_1= " << setw(15) << RunningSumLineEntropy[0] 
-		 <<  "    LineEnt_2= " << setw(15) << RunningSumLineEntropy[1] <<  "    LineEnt_3= " << setw(15) 
-		 << RunningSumLineEntropy[2] << endl;
 	  }
-	}
-      }
+	*/
+	/*
+	  if(fileGraphs.size()-1 > i){ if(fileGraphs.at(i).NumberSites != fileGraphs.at(i+1).NumberSites){ 
+	  cout <<"Order " <<setw(3)<< fileGraphs.at(i).NumberSites << "    RunningSumEnergy="
+	  <<setw(15)<< RunningSumEnergy << "    LineEnt_1= " << setw(15) << RunningSumLineEntropy[0] 
+	  <<  "    LineEnt_2= " << setw(15) << RunningSumLineEntropy[1] <<  "    LineEnt_3= " << setw(15) 
+	  << RunningSumLineEntropy[2] << endl;
+	  }
+	  }
+	*/
+      
       
 
-      //FIND A GOOD WAY TO OUTPUT THE DATA!_!_!_!_!_!_!_!_!_!_!_!_!     
-      for(int a=0; a<alphas.size(); a++){ 
-	//	 cout << "h= " << setw(6) << h << " Ener= "<<setw(15)<<RunningSumEnergy<< " Mag= " << setw(15) << RunningSumMagnetization  
-	   cout << "Jp= " << setw(6) << Jperp << " Ener= "<<setw(15)<<RunningSumEnergy<< "   " 
-	      << "  S_ " << setw (5) << alphas[a] << "  Line= "<< setw(16) << RunningSumLineEntropy[a] 
-	      << " Corn=" << setw(17) << RunningSumCornerEntropy[a] << endl;
-      }
-      cout << endl;
-
-      WeightEnergy.clear();
-      RunningSumEnergy=0;
-
-      for(int a=0; a<numRenyis; a++){
-	WeightLineEntropy[a].clear();
-	WeightCornerEntropy[a].clear();
-	RunningSumLineEntropy[a]=0;
-	RunningSumCornerEntropy[a]=0;
+	//FIND A GOOD WAY TO OUTPUT THE DATA!_!_!_!_!_!_!_!_!_!_!_!_!     
+	
+	cout <<"Graph " << setw(3) << fileGraphs.at(i).Identifier <<  " Sites " <<setw(2)<< fileGraphs.at(i).NumberSites 
+	     << "  Jp= " << setw(6) << Jperp << "   E=" <<setw(16)<< WeightEnergy << " Line";
+	
+	for(int a=0; a<alphas.size(); a++){ 
+	  cout  << setw(4) <<  alphas[a] << setw(16) << WeightLineEntropy[a] ;
+	}
+	cout << " Corner";
+	for(int a=0; a<alphas.size(); a++){ 
+	  cout  <<setw (4) << alphas[a] << setw(16) << WeightCornerEntropy[a];
+	}
+	cout << endl;
+	
+	WeightEnergy=0;
+	
+	for(int a=0; a<numRenyis; a++){
+	  WeightLineEntropy[a]=0;
+	  WeightCornerEntropy[a]=0;
+	}
       }
     }
 
