@@ -19,12 +19,12 @@ using namespace std;
 #include <iomanip>
 #include <sstream>
 
-#include "Lanczos_07.h"
-#include "GenHam.h"
-#include "lapack.h"
-#include "simparam.h"
+//#include "Lanczos_07.h"
+//#include "GenHam.h"
+//#include "lapack.h"
+//#include "simparam.h"
 #include "graphs.h"
-#include "entropy.h"
+//#include "entropy.h"
   
 void ReadMeasurementFile( vector< double > & Measurements, const string & file);
 
@@ -194,24 +194,25 @@ int main(int argc, char** argv){
   //----------------------------------------------------------
     
     //find the maximum order
-    int max=0;
-    for(int i=0; i<Energy.size(); i++){ if(Nsites[i]>max){max=Nsites[i];} }
-    max-=2;
+    int maxSize;
+    int maxOrder;
+    for(int i=0; i<Energy.size(); i++){ if(Nsites[i]>maxOrder){maxOrder=Nsites[i];} }
+    maxSize = maxOrder-2;
     
     vector<double> NLCEnergy;
     vector< vector< pair<double, double> > > NLCLine, NLCCorner;
       
-    NLCEnergy.resize(max);
-    NLCLine.resize(max);
-    NLCCorner.resize(max);
+    NLCEnergy.resize(maxSize);
+    NLCLine.resize(maxSize);
+    NLCCorner.resize(maxSize);
 
-    for (int order=2; order<max; order++){
+    for (int order=2; order<maxOrder; order++){
       for(int graph=0; graph<Energy.size(); graph++){
 	if(Nsites[graph]<=order){ 
-	  NLCEnergy[order] += WEnergy[graph]*fileGraphs.at(graph).LatticeConstant;
+	  NLCEnergy[order-2] += WEnergy[graph]*fileGraphs.at(graph).LatticeConstant;
 	  for(int a=0; a<Alphas; a++){
-	    NLCLine[order][a].second += WLine[graph][a].second*fileGraphs.at(graph).LatticeConstant;
-	    NLCCorner[order][a].second += WCorner[graph][a].second*fileGraphs.at(graph).LatticeConstant;
+	    NLCLine[order-2][a].second += WLine[graph][a].second*fileGraphs.at(graph).LatticeConstant;
+	    NLCCorner[order-2][a].second += WCorner[graph][a].second*fileGraphs.at(graph).LatticeConstant;
 	  }
 	}
       }
@@ -220,25 +221,25 @@ int main(int argc, char** argv){
   //----------------------------------------------------------
   // Output results
   //----------------------------------------------------------
-
-    /*
     
-    cout <<"Order " <<setw(3)<< fileGraphs.at(i).NumberSites << "    RunningSumEnergy="
-	 <<setw(15)<< RunningSumEnergy << "    LineEnt_1= " << setw(15) << RunningSumLineEntropy[0] 
-	 <<  "    LineEnt_2= " << setw(15) << RunningSumLineEntropy[1] <<  "    LineEnt_3= " << setw(15) 
-	 << RunningSumLineEntropy[2] << endl;
-
-
     //ofstream fout(OutputFile.c_str());
     //fout.precision(10);
     cout.precision(10);
 
-    
-    //FIND A GOOD WAY TO OUTPUT THE DATA!_!_!_!_!_!_!_!_!_!_!_!_!     
-    for(int a=0; a<alphas.size(); a++){ 
-      cout << "Jp= " << setw(6) << Jperp << " Ener= "<<setw(15)<<RunningSumEnergy<< "   " 
-	   << "  S_ " << setw (5) << alphas[a] << "  Line= "<< setw(16) << RunningSumLineEntropy[a] 
-	   << " Corn=" << setw(17) << RunningSumCornerEntropy[a] << endl;
+    for(int o=2; o<maxOrder; o++){
+      cout <<"Order " <<setw(3)<< o << " Jp " << setw(5) << Jperp[1] << " Energy " << setw(15) << NLCEnergy[o-2]
+	   <<" LineEntropies ";
+
+      for(int a=0; a<alphas.size(); a++){
+	cout << setw (5) << NLCLine[order-2][a].first << setw(15) <<  NLCLine[order-2][a].second ;
+      }
+      
+      cout << " CornerEntropies ";
+	
+      for(int a=0; a<alphas.size(); a++){
+	cout << setw (5) << NLCCorner[order-2][a].first << setw(15) <<  NLCCorner[order-2][a].second ;
+      }
+      cout << endl;
     }
     cout << endl;
     
