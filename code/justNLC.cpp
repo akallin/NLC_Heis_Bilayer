@@ -26,8 +26,6 @@ using namespace std;
 #include "graphs.h"
 //#include "entropy.h"
   
-void ReadMeasurementFile( vector< double > & Measurements, const string & file);
-
 int main(int argc, char** argv){
 
   int CurrentArg = 1;
@@ -57,6 +55,7 @@ int main(int argc, char** argv){
   // Read Graphs in from File
   //-------------------------------
 
+  vector < graph > fileGraphs;
   ReadGraphsFromFile(fileGraphs, InputFileGraphs);
 
   //-------------------------------
@@ -97,7 +96,6 @@ int main(int argc, char** argv){
     RenyiCorner.resize(numLines);
 
     stringstream ss (stringstream::in | stringstream::out);
-    
 
     // Check the number of alphas
     ss << rawLines.at(0);
@@ -106,7 +104,7 @@ int main(int argc, char** argv){
       ss >> tempstring;
       Alphas++;
     }
-    cout << "number of graphs is " << Alphas <<endl;
+    cout << "number of entries is " << Alphas <<endl;
     Alphas = (Alphas - 10)/4;
     cout << "number of Renyis is " << Alphas << endl;
 
@@ -154,9 +152,9 @@ int main(int argc, char** argv){
 
     // print out results
     /*
-      for(int i=0; i<numLines; i++){
+    for(int i=0; i<numLines; i++){
       cout << "Identifier " << Identifier[i] << ", # sites " << Nsites[i] << ", Jperp " << Jperp[i] 
-      << ", Energy " << Energy[i] << " Line ents ";
+	   << ", Energy " << Energy[i] << " Line ents ";
       for(int j=0; j<Alphas; j++){ cout << RenyiLine[i][j].first << " " << RenyiLine[i][j].second <<", ";}
       cout << "Corner ents ";
       for(int j=0; j<Alphas; j++){ cout << RenyiCorner[i][j].first << " " << RenyiCorner[i][j].second <<", ";}
@@ -168,6 +166,7 @@ int main(int argc, char** argv){
   //----------------------
   // Calculate the weights
   //----------------------
+    cout << "Weights\n";
 
     vector<double> WEnergy;
     vector< vector< pair<double, double> > > WLine, WCorner;
@@ -177,14 +176,14 @@ int main(int argc, char** argv){
     WCorner = RenyiCorner;
 
     //------------ Loop through the graphs and subgraphs
-    for (int graph=0; graph<WEnergy.size(); graph++){
+    for (int graph=0; graph<numLines; graph++){
       
       for (int sub = 0; sub < fileGraphs.at(graph).SubgraphList.size(); sub++){
-	WEnergy[graph] -= fileGraphs.at(i).SubgraphList[j].second * WEnergy[fileGraphs.at(i).SubgraphList[j].first];
+	WEnergy[graph] -= fileGraphs.at(graph).SubgraphList[sub].second * WEnergy[fileGraphs.at(graph).SubgraphList[sub].first];
 	
 	for(int a=0; a<Alphas; a++){
-	    WLine[graph][a].second -= fileGraphs.at(i).SubgraphList[j].second * WLine[fileGraphs.at(i).SubgraphList[j].first][a].second;
-	    WCorner[graph][a].second -= fileGraphs.at(i).SubgraphList[j].second * WCorner[fileGraphs.at(i).SubgraphList[j].first][a].second;
+	    WLine[graph][a].second -= fileGraphs.at(graph).SubgraphList[sub].second * WLine[fileGraphs.at(graph).SubgraphList[sub].first][a].second;
+	    WCorner[graph][a].second -= fileGraphs.at(graph).SubgraphList[sub].second * WCorner[fileGraphs.at(graph).SubgraphList[sub].first][a].second;
 	}	  
       }      
     }
@@ -192,11 +191,12 @@ int main(int argc, char** argv){
   //----------------------------------------------------------
   // Add all the weights (to get the results for every order)
   //----------------------------------------------------------
+    cout << "Sum\n";
     
     //find the maximum order
     int maxSize;
     int maxOrder;
-    for(int i=0; i<Energy.size(); i++){ if(Nsites[i]>maxOrder){maxOrder=Nsites[i];} }
+    for(int i=0; i<numLines; i++){ if(Nsites[i]>maxOrder){maxOrder=Nsites[i];} }
     maxSize = maxOrder-2;
     
     vector<double> NLCEnergy;
@@ -207,12 +207,16 @@ int main(int argc, char** argv){
     NLCCorner.resize(maxSize);
 
     for (int order=2; order<maxOrder; order++){
+
+      NLCLine[order-2].resize(Alphas);
+      NLCCorner[order-2].resize(Alphas);
+
       for(int graph=0; graph<Energy.size(); graph++){
 	if(Nsites[graph]<=order){ 
 	  NLCEnergy[order-2] += WEnergy[graph]*fileGraphs.at(graph).LatticeConstant;
 	  for(int a=0; a<Alphas; a++){
-	    NLCLine[order-2][a].second += WLine[graph][a].second*fileGraphs.at(graph).LatticeConstant;
-	    NLCCorner[order-2][a].second += WCorner[graph][a].second*fileGraphs.at(graph).LatticeConstant;
+	    NLCLine[order-2][a].second += WLine[graph][a].second * fileGraphs.at(graph).LatticeConstant;
+	    NLCCorner[order-2][a].second += WCorner[graph][a].second * fileGraphs.at(graph).LatticeConstant;
 	  }
 	}
       }
@@ -221,29 +225,32 @@ int main(int argc, char** argv){
   //----------------------------------------------------------
   // Output results
   //----------------------------------------------------------
-    
+    cout << "Output\n";
+
     //ofstream fout(OutputFile.c_str());
     //fout.precision(10);
     cout.precision(10);
+
+    cout << endl;
 
     for(int o=2; o<maxOrder; o++){
       cout <<"Order " <<setw(3)<< o << " Jp " << setw(5) << Jperp[1] << " Energy " << setw(15) << NLCEnergy[o-2]
 	   <<" LineEntropies ";
 
-      for(int a=0; a<alphas.size(); a++){
-	cout << setw (5) << NLCLine[order-2][a].first << setw(15) <<  NLCLine[order-2][a].second ;
+      for(int a=0; a<Alphas; a++){
+	cout << setw (5) << RenyiLine[o-2][a].first << setw(15) <<  NLCLine[o-2][a].second ;
       }
       
       cout << " CornerEntropies ";
 	
-      for(int a=0; a<alphas.size(); a++){
-	cout << setw (5) << NLCCorner[order-2][a].first << setw(15) <<  NLCCorner[order-2][a].second ;
+      for(int a=0; a<Alphas; a++){
+	cout << setw (5) << RenyiCorner[o-2][a].first << setw(15) <<  NLCCorner[o-2][a].second ;
       }
       cout << endl;
     }
     cout << endl;
     
-    */
+    
     // fout.close();
     return 0;
 }
