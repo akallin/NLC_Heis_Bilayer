@@ -153,7 +153,7 @@ int main(int argc, char** argv){
 
 	}
 
-	//---------- Energy/Entropy NLC Calculation --------
+	//---------- Push Back the results --------
 	WeightEnergy=energy;
 	
 	//Loop Here!!!  ALSO MAKE NOTE THAT LINE IS FIRST AND CORNER IS SECOND !_!_!_!_!_!_!_!_!_!_!_!_!_!
@@ -161,30 +161,10 @@ int main(int argc, char** argv){
 	  WeightLineEntropy[a] = entVec[a].first;
 	  WeightCornerEntropy[a] = entVec[a].second;
 	}
-	
-	/*
-	  for (int j = 0; j<fileGraphs.at(i).SubgraphList.size(); j++){
-	  WeightEnergy.back() -= fileGraphs.at(i).SubgraphList[j].second * WeightEnergy[fileGraphs.at(i).SubgraphList[j].first];
-	  
-	  for(int a=0; a<numRenyis; a++){
-	  WeightLineEntropy[a].back() -= fileGraphs.at(i).SubgraphList[j].second * WeightLineEntropy[a][fileGraphs.at(i).SubgraphList[j].first];
-	  WeightCornerEntropy[a].back() -= fileGraphs.at(i).SubgraphList[j].second * WeightCornerEntropy[a][fileGraphs.at(i).SubgraphList[j].first];
-	  }	  
-	  }
-	*/
-	/*
-	  if(fileGraphs.size()-1 > i){ if(fileGraphs.at(i).NumberSites != fileGraphs.at(i+1).NumberSites){ 
-	  cout <<"Order " <<setw(3)<< fileGraphs.at(i).NumberSites << "    RunningSumEnergy="
-	  <<setw(15)<< RunningSumEnergy << "    LineEnt_1= " << setw(15) << RunningSumLineEntropy[0] 
-	  <<  "    LineEnt_2= " << setw(15) << RunningSumLineEntropy[1] <<  "    LineEnt_3= " << setw(15) 
-	  << RunningSumLineEntropy[2] << endl;
-	  }
-	  }
-	*/
-      
+
       
 
-	//FIND A GOOD WAY TO OUTPUT THE DATA!_!_!_!_!_!_!_!_!_!_!_!_!     
+	//Output the Data!!   
 	
 	cout <<"Graph " << setw(3) << fileGraphs.at(i).Identifier <<  " Sites " <<setw(2)<< fileGraphs.at(i).NumberSites 
 	     << "  Jp= " << setw(6) << Jperp << "   E=" <<setw(16)<< WeightEnergy << " Line";

@@ -6,7 +6,7 @@ CFLAGS = -O2
 LIBS = -framework Accelerate
 
 2dEE.out: $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o 2dEE.out $(LIBS)
+	$(CC) $(CFLAGS) $(OBJS) -o 2dmeas.out $(LIBS)
 
 Measurements.o : Measurements.cpp GenHam.h Lanczos_07.h lapack.h simparam.h 
 	$(CC) $(CFLAGS) -c Measurements.cpp
