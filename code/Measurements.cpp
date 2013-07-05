@@ -124,8 +124,12 @@ int main(int argc, char** argv){
 	  else if(fileGraphs.at(i).NumberSites==2){
 	    energy = -0.75*J;
 	    for(int a=0; a<numRenyis; a++){
-	      entVec[a].first=log(2.0);  //check these values
-	      entVec[a].second=0;        //check 'em
+	      if(fileGraphs.at(i).RealSpaceCoordinates[0].size()==2){
+		entVec[a].first=log(2.0); 
+	      }
+	    
+	      else{ entVec[a].first=0; }
+	      entVec[a].second=0;       
 	    }
 	  }
 	  else{
@@ -133,8 +137,13 @@ int main(int argc, char** argv){
 	    double eig1(5./6.);
 	    double eig2(1./6.);
 	    for(int a=0; a<numRenyis; a++){
-	      if(fabs(1.0-(alphas[a]))<0.000001){entVec[a].first=2.*(-eig1*log(eig1)-eig2*log(eig2));}
-	      else{entVec[a].first=(2./(1.-alphas[a]))*log(pow(eig1,alphas[a])+pow(eig2,alphas[a]));}
+	      if(fileGraphs.at(i).RealSpaceCoordinates[0].size()==3){
+		if(fabs(1.0-(alphas[a]))<0.000001){entVec[a].first=2.*(-eig1*log(eig1)-eig2*log(eig2));}
+		else{entVec[a].first=(2./(1.-alphas[a]))*log(pow(eig1,alphas[a])+pow(eig2,alphas[a]));}
+	      }
+	      else{
+		entVec[a].first=0;
+	      }
 	      entVec[a].second=0;
 	    }
 	  }
