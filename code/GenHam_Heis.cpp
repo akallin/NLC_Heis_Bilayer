@@ -33,7 +33,7 @@ GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vecto
       //Specifically targe the Sz=0 sector: HAMILTONIAN MUST CONSERV Sz
       if (temp==((Nsite+1)/2) ){  //Integer division! Gives Sz=-1/2 sector for odd # of spins  
           Basis.push_back(i1);
-          BasPos.at(i1)=Basis.size()-1;
+          BasPos[i1]=Basis.size()-1;
           Vdim++;
       }
 
@@ -84,16 +84,16 @@ void GENHAM::SparseHamJQ()
       tempH.clear(); 
       tempBas.clear();
 
-      tempi = Basis.at(ii);
+      tempi = Basis[ii];
       tempBas.push_back(0); //first element (Row size)
       tempH.push_back(0); //make base 0
 
       //-----1:  Create the diagonal part of the Hamiltonian
-      tempBas.push_back(BasPos.at(tempi));  
+      //tempBas.push_back(BasPos.at(tempi));  // The first element for state tempi is the diag element.
+                                              // So comment this line out for on-the-fly diag calculation
 
-      // HdiagPart has *two* indices in the TFIM case.... do we need that?
-      tempD = (*this).HdiagPart(tempi);  //tempD = address of GENHAM.Hdiagpart(i)
-      tempH.push_back(tempD); 
+      //tempD = (*this).HdiagPart(tempi);  //tempD = address of GENHAM.Hdiagpart(i)
+      //tempH.push_back(tempD); 
 
       for (int T0=0; T0<Bond.size(); T0++){ //T0 is your square index
 
@@ -105,34 +105,34 @@ void GENHAM::SparseHamJQ()
           sj = Bond[T0].second; // Second element of T0th bond
           tempod ^= (1<<si);   //flips si spin in tempod
           tempod ^= (1<<sj);   //flips sj spin in tempod
-          if (BasPos.at(tempod) != -1 && BasPos.at(tempod) > ii){ //build only upper half of matrix
-              tempBas.push_back(BasPos.at(tempod));
+          if (BasPos[tempod] != -1 && BasPos[tempod] > ii){ //build only upper half of matrix
+              tempBas.push_back(BasPos[tempod]);
               tempD = (*this).HOFFdBondX(T0,tempi);
               tempH.push_back(tempD); 
           }
 
       }//si
 
-      tempBas.at(0) = tempBas.size()-1;
+      tempBas[0] = tempBas.size()-1;
       //cout<<tempBas.at(0)<<" "<<tempBas.size()<<" "<<tempH.size()<<endl;
 
-      //bubble sort (slow) 
-      long stemp;
+      //bubble sort (extra slow) //Why is this necessary??
+    /*  long stemp;
       bool noswap = false;
       while (noswap == false){
           noswap = true; 
           for (int i2=1; i2<tempBas.size()-1; i2++){ //ignore 0 element
-              if (tempBas.at(i2) > tempBas.at(i2+1) ) {
-                  stemp = tempBas.at(i2);
-                  tempBas.at(i2) = tempBas.at(i2+1);
-                  tempBas.at(i2+1) = stemp;
-                  tempD = tempH.at(i2);
-                  tempH.at(i2) = tempH.at(i2+1);
-                  tempH.at(i2+1) = tempD;
+              if (tempBas[i2] > tempBas[i2+1] ) {
+                  stemp = tempBas[i2];
+                  tempBas[i2] = tempBas[i2+1];
+                  tempBas[i2+1] = stemp;
+                  tempD = tempH[i2];
+                  tempH[i2] = tempH[i2+1];
+                  tempH[i2+1] = tempD;
                   noswap = false;
               }
           }//i2
-      }//while
+      }//while */
 
       PosHam.push_back(tempBas);
       ValHam.push_back(tempH);
@@ -144,21 +144,20 @@ void GENHAM::SparseHamJQ()
 //----------------------------------------------------------
 double GENHAM::HdiagPart(const long bra){
 
-  int S0b,S1b ;  //spins (bra 
+  int S0b,S1b ;  //spins (bra) 
   int T0,T1;  //site
-  //  int P0, P1, P2, P3; //sites for plaquette (Q)
-  //  int s0p, s1p, s2p, s3p;
   double valH = 0;
 
   for (int Ti=0; Ti< Bond.size(); Ti++){
     //***HEISENBERG PART
 
     T0 = Bond[Ti].first; //first spin
-    S0b = (bra>>T0)&1;  
+    S0b = (bra>>T0)&1;   // Value of first spin 
     //if (T0 != Ti) cout<<"Square error 3\n";
+
     T1 = Bond[Ti].second; //second spin
-    S1b = (bra>>T1)&1;  //unpack bra
-    valH += JJ*(S0b-0.5)*(S1b-0.5);
+    S1b = (bra>>T1)&1;    // Value of second spin
+    valH += JJ*(S0b-0.5)*(S1b-0.5); // = J(S_1 *S_2)
 
   }//T0
 

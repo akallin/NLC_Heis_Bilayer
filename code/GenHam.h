@@ -28,13 +28,15 @@ class GENHAM{
 
         //The function that makes the Hamiltonian
         void SparseHamJQ();
+        
+        //The bond list (needs to be public to calc diag terms on the fly)
+        vector< pair < int,int> > Bond;
 
     private:
         int Nsite; //number sites
         bool LowField; //High or Low Field expansion
 
-        vector< pair < int,int> > Bond;
-
+        
         long double JJ; //heisenberg exchange value
         long double JJ2; // J2 value (for heis bilayer)
 

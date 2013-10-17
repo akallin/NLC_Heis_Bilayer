@@ -16,8 +16,7 @@ LANCZOS::LANCZOS(const int Dim_) : Dim (Dim_)
 double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2, vector<l_double>& Psi)
 // Reduces the Hamiltonian Matrix to a tri-diagonal form 
 {
-
-    Psi.resize(Dim);
+    Psi.resize(Dim); // This comes from genham.Vdim. It's equal to [Nspins Choose (Nspins/2)] for Heis
     int ii;
     int iter, MAXiter, EViter;
     int min;
@@ -49,7 +48,7 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
 
     for (EViter = 0; EViter < Evects2; EViter++) {//0=get E0 converge, 1=get eigenvec
         iter = 0;
-    //create a "random" starting vector
+    //create a "random" starting vector 
         V0.assign(Dim, 0.0);
         //V0[ 0 ] = 1.0;
         if( V0.size() == 4) V0[1] = 1.0;
@@ -57,19 +56,21 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
         { 
             //V0[vi] = 1.0;
             if (vi == V0.size() - 1 && V0.size() != 4) V0[vi] = 1.0;
-            //else if (vi%5 == 0) V0[vi] = -2.0;
-            //else if (vi%7 == 0) V0[vi] = 3.0;
+            else if (vi%5 == 0) V0[vi] = -2.0;
+            else if (vi%7 == 0) V0[vi] = 3.0;
             //else if (vi%9 == 0) V0[vi] = -4.0;
         }
         //if(V0.size()>4){V0[V0.size()-1]=1.0;}
         Normalize(V0);  
    
-        if (EViter == 1) for( ii = 0; ii < Dim; ii++) Psi[ii] = V0[ii] * (Hmatrix[0][min]);
+
+        // For the 2nd iteration only.... (get the eigenvector???) 
+        if (EViter == 1) for( ii = 0; ii < Dim; ii++){ Psi[ii] = V0[ii] * (Hmatrix[0][min]);}
     
         V1.assign(Dim, 0.);
         beta[0] = 0;  //beta_0 not defined
     
-        //****** do V1=H|V0> below
+        //****** do V1=H|V0> below ** Big Matrix multiplication.  Do the diags on the fly!!!
         apply(V1, SparseH, V0);
 
         alpha[0] = 0;
@@ -92,7 +93,7 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
 
             iter++;
 
-            //****** do V2=H|V1> below
+            //****** do V2=H|V1> below ** Big Matrix multiplication.  Do the diags on the fly!!!
             apply(V2, SparseH, V1);
 
             alpha[iter] = 0.;
@@ -223,12 +224,33 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
 void LANCZOS::apply(vector< l_double > & U, const GENHAM& H, const vector< l_double > & V)  //apply H to |V>
 {
     int kk;
+    double J=1; //Note i'm not actually using the proper J here!
     U.assign(U.size(), 0.);
+    l_double Hdiag=0;
+    int bra=-1;
+    int T0,T1,S0b,S1b;
 
     for (int ii = 0; ii < Dim; ii++) 
     {
-        for (int jj = 1; jj <= H.PosHam[ii][0]; jj++)
+        Hdiag=0;
+        bra = H.Basis[ii];
+
+        //Do the diagonal part here (one for each bond)
+        for(int b=0; b<H.Bond.size(); b++){
+        
+            T0 = H.Bond[b].first; //Location of spin 1
+            S0b = (bra>>T0)&1;    //Value of spin 1
+
+            T1 = H.Bond[b].second; //Location of spin 2
+            S1b = (bra>>T1)&1;      //Value of spin 2
+
+            Hdiag += J*(S0b-0.5)*(S1b-0.5); //Hamiltonian term for bond b
+        }
+
+        U[ii] += Hdiag * V[ii];
+        for (int jj = 1; jj <= H.PosHam[ii][0]; jj++) //PosHam[i][0] is the row size
         {
+            //Off-diagonal part
             kk = H.PosHam[ii][jj]; //position index
             U[ii] += H.ValHam[ii][jj] * V[kk];
             if (ii != kk) U[kk] += H.ValHam[ii][jj] * V[ii]; //contribution to lower half
