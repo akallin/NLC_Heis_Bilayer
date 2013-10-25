@@ -1,6 +1,6 @@
 OBJS = Measurements.cpp GenHam_Heis.o  Lanczos_07.o lapack.o graphs.o 
 CC = g++
-CFLAGS = -O2 
+CFLAGS = -g -O2 
 #CFLAGS = -O2 -arch x86_64
 #LIBS = -lm -framework veclib
 LIBS = -framework Accelerate

@@ -35,10 +35,6 @@ class LANCZOS{
    int STARTIT;  //how many iterations to "always" perform
    l_double CONV_PREC; //convergence precision
 
-   vector<l_double> V0;  
-   vector<l_double> V1;    //Ground state vector
-   vector<l_double> V2;
-
    void apply( vector<l_double> &, const GENHAM &, const vector<l_double>&);  //apply H to |V>
    void Normalize(vector<l_double>& );
    int tqli2(vector<l_double>& , vector<l_double>& , int , vector< vector<l_double > > & , const int );

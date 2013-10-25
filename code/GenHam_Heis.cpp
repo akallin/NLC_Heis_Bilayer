@@ -20,7 +20,7 @@ GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vecto
 
   //BasPos holds the position of state x (in the vector Basis) in its x^th element
   BasPos.clear();
-  BasPos.resize(Dim,-99); //initialization 
+  BasPos.resize(Dim,-1); //initialization 
   Vdim=0;
   unsigned long temp;    //create basis
 
@@ -67,7 +67,6 @@ void GENHAM::printg()
 //----------------------------------------------------------
 void GENHAM::SparseHamJQ()
 //This function generates a sparse-matrix representation of the Hamiltonian.
-
 {
   int ii, jj;
 
@@ -95,20 +94,22 @@ void GENHAM::SparseHamJQ()
       //tempD = (*this).HdiagPart(tempi);  //tempD = address of GENHAM.Hdiagpart(i)
       //tempH.push_back(tempD); 
 
-      for (int T0=0; T0<Bond.size(); T0++){ //T0 is your square index
-
+      // Loop through all possible bonds
+      for (int T0=0; T0<Bond.size(); T0++){ 
           // si is the first element of the T0^th bond
-          si = Bond[T0].first; //the lower left bond spin is not always T0
-          //if (si != T0) cout<<"Square error 2\n";
-          //-----2:   first bond (Horizontal)
+          si = Bond[T0].first;
+                    
           tempod = tempi;
-          sj = Bond[T0].second; // Second element of T0th bond
-          tempod ^= (1<<si);   //flips si spin in tempod
-          tempod ^= (1<<sj);   //flips sj spin in tempod
-          if (BasPos[tempod] != -1 && BasPos[tempod] > ii){ //build only upper half of matrix
+          sj = Bond[T0].second; // Second spin of T0th bond
+        //  tempod ^= (1<<si);   //flips si spin in tempod
+        //  tempod ^= (1<<sj);   //flips sj spin in tempod
+          tempod ^= ((1<<sj)+(1<<si));   //flips spins si and sj in tempod
+          // first part checks if we're still in Sz=0 sector and second part ... 
+          if (BasPos[tempod] > -1 && BasPos[tempod] > ii){ //builds only upper half of matrix
               tempBas.push_back(BasPos[tempod]);
               tempD = (*this).HOFFdBondX(T0,tempi);
               tempH.push_back(tempD); 
+              //tempH.push_back(0.5*JJ); 
           }
 
       }//si
@@ -179,4 +180,6 @@ double GENHAM::HOFFdBondX(const int si, const long bra){
   return valH;
 
 }//HOFFdPart
+
+
 

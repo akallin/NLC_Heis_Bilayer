@@ -6,9 +6,6 @@ LANCZOS::LANCZOS(const int Dim_) : Dim (Dim_)
   STARTIT = 5; //I always make sure to start with at least 5 iterations (but see line 159...)
   CONV_PREC = 1E-10; //The precision with which we converge to
 
-  V0.resize(Dim_);  //resize the 3 lanczos vectors
-  V1.resize(Dim_);  
-  V2.resize(Dim_);
 
 }//constructor
 
@@ -16,7 +13,14 @@ LANCZOS::LANCZOS(const int Dim_) : Dim (Dim_)
 double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2, vector<l_double>& Psi)
 // Reduces the Hamiltonian Matrix to a tri-diagonal form 
 {
-    Psi.resize(Dim); // This comes from genham.Vdim. It's equal to [Nspins Choose (Nspins/2)] for Heis
+    vector<l_double> V0;  
+    vector<l_double> V1;    //Ground state vector
+    vector<l_double> V2;
+
+    V0.resize(Dim);  //resize the 3 lanczos vectors
+    V1.resize(Dim);  
+    V2.resize(Dim);
+
     int ii;
     int iter, MAXiter, EViter;
     int min;
@@ -48,7 +52,7 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
 
     for (EViter = 0; EViter < Evects2; EViter++) {//0=get E0 converge, 1=get eigenvec
         iter = 0;
-    //create a "random" starting vector 
+        //create a "random" starting vector 
         V0.assign(Dim, 0.0);
         //V0[ 0 ] = 1.0;
         if( V0.size() == 4) V0[1] = 1.0;
@@ -64,9 +68,12 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
         Normalize(V0);  
    
 
-        // For the 2nd iteration only.... (get the eigenvector???) 
-        if (EViter == 1) for( ii = 0; ii < Dim; ii++){ Psi[ii] = V0[ii] * (Hmatrix[0][min]);}
-    
+        // For the 2nd iteration only.... 
+        if (EViter == 1) {
+            Psi.resize(Dim); 
+            for( ii = 0; ii < Dim; ii++){ Psi[ii] = V0[ii] * (Hmatrix[0][min]);}
+        }
+
         V1.assign(Dim, 0.);
         beta[0] = 0;  //beta_0 not defined
     
@@ -216,6 +223,7 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
 //    cout<<ii<<" "<<V2(ii)/Psi(ii)<<" EVdiv \n";
 
 //  return E0;
+
   return Energy;
 
 }//end Diag
@@ -240,7 +248,7 @@ void LANCZOS::apply(vector< l_double > & U, const GENHAM& H, const vector< l_dou
         
             T0 = H.Bond[b].first; //Location of spin 1
             S0b = (bra>>T0)&1;    //Value of spin 1
-
+            
             T1 = H.Bond[b].second; //Location of spin 2
             S1b = (bra>>T1)&1;      //Value of spin 2
 

@@ -2,7 +2,7 @@
 #ifndef entropy_H
 #define entropy_H
 
-void getEE( vector <double>& alpha1, vector <double>& CornLineEnts, vector< vector<long double> >& SuperMat );
+void getEE( vector <double>& alpha1, vector <double>& CornLineEnts, vector< vector<double> >& SuperMat );
 unsigned int full_hilb( unsigned na );
 unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long> &Abasis, vector<long> &AbasPos );
 		    
@@ -22,7 +22,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
   vector <long> Abasis, Bbasis, AbasPos, BbasPos;
 
   // A rectangular matrix containing the eigenvalues, used to get the RDM
-  vector< vector< long double > > SuperMat;
+  vector< vector<double > > SuperMat;
 
   // Some temp variables;
   int tempState(-1);         // The current full basis state we're looking at
@@ -335,12 +335,12 @@ unsigned int full_hilb( unsigned na ){
 /* -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
    getEE
 -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*- */
-void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vector<long double> >& SuperMat ){
+void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vector<double> >& SuperMat ){
   // The Density Matrix
   //Array <double,2> DM;
   double *DM; //create a pointer to a c-style array
 
-  long double temp(0);
+  double temp(0);
   int Dim(0);
 
   // Using SuperMat to get the density matrix

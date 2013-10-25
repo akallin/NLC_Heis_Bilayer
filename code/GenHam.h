@@ -45,5 +45,4 @@ class GENHAM{
         double HOFFdBondX(const int, const long);
 
 };
-
 #endif
