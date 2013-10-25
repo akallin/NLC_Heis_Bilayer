@@ -158,8 +158,6 @@ int main(int argc, char** argv){
 
                 //---------- Diagonalize and get Eigenvector -------
                 energy = lancz.Diag(HV, 1, prm.valvec_, eVec); // Hamiltonian, # of eigenvalues to converge, 1 for -values only, 2 for vals AND vectors
-                HV.PosHam.resize(0);
-                HV.ValHam.resize(0);
                 HV.BasPos.resize(0);
                 Entropy2D(alphas, eVec, entVec, fileGraphs.at(i).RealSpaceCoordinates, HV.Basis);
             }
