@@ -154,7 +154,7 @@ int main(int argc, char** argv){
                 GENHAM HV(fileGraphs.at(i).NumberSites,J,Jperp,fileGraphs.at(i).AdjacencyList); 
 
                 LANCZOS lancz(HV.Vdim);  //dimension of Hilbert space
-                HV.SparseHamJQ();  //generates sparse matrix Hamiltonian for Lanczos
+                //HV.SparseHamJQ();  //generates sparse matrix Hamiltonian for Lanczos
 
                 //---------- Diagonalize and get Eigenvector -------
                 energy = lancz.Diag(HV, 1, prm.valvec_, eVec); // Hamiltonian, # of eigenvalues to converge, 1 for -values only, 2 for vals AND vectors

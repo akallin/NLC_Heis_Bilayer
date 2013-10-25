@@ -236,6 +236,7 @@ void LANCZOS::apply(vector< l_double > & U, const GENHAM& H, const vector< l_dou
     U.assign(U.size(), 0.);
     l_double Hdiag=0;
     int bra=-1;
+    int flip=-1;
     int T0,T1,S0b,S1b;
 
     for (int ii = 0; ii < Dim; ii++) 
@@ -243,7 +244,7 @@ void LANCZOS::apply(vector< l_double > & U, const GENHAM& H, const vector< l_dou
         Hdiag=0;
         bra = H.Basis[ii];
 
-        //Do the diagonal part here (one for each bond)
+        //Loop through all lattice bonds
         for(int b=0; b<H.Bond.size(); b++){
         
             T0 = H.Bond[b].first; //Location of spin 1
@@ -251,18 +252,29 @@ void LANCZOS::apply(vector< l_double > & U, const GENHAM& H, const vector< l_dou
             
             T1 = H.Bond[b].second; //Location of spin 2
             S1b = (bra>>T1)&1;      //Value of spin 2
+            
+            //Offdiagonal Terms
+            if(S0b^S1b){ //if spins are opposite (10 or 01)
+                flip = bra^((1<<T0)+(1<<T1)); //Flip both spins
+                kk = H.BasPos[flip];
+                U[ii] += J*0.5 * V[kk];
+                if(ii==kk) cout << "OMG\n";
+            }//Offdiag
 
             Hdiag += J*(S0b-0.5)*(S1b-0.5); //Hamiltonian term for bond b
-        }
 
-        U[ii] += Hdiag * V[ii];
-        for (int jj = 1; jj <= H.PosHam[ii][0]; jj++) //PosHam[i][0] is the row size
-        {
-            //Off-diagonal part
-            kk = H.PosHam[ii][jj]; //position index
-            U[ii] += H.ValHam[ii][jj] * V[kk];
-            if (ii != kk) U[kk] += H.ValHam[ii][jj] * V[ii]; //contribution to lower half
         }
+        U[ii] += Hdiag * V[ii]; //diagonal terms
+
+
+//        for (int jj = 1; jj <= H.PosHam[ii][0]; jj++) //PosHam[i][0] is the row size
+//        {
+//            //Off-diagonal part
+//            kk = H.PosHam[ii][jj]; //position index
+//            U[ii] += H.ValHam[ii][jj] * V[kk];
+//            if (ii != kk) U[kk] += H.ValHam[ii][jj] * V[ii]; //contribution to lower half
+//        }
+//        
     }
 
 }//apply

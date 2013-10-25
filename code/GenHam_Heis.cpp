@@ -67,6 +67,7 @@ void GENHAM::printg()
 //----------------------------------------------------------
 void GENHAM::SparseHamJQ()
 //This function generates a sparse-matrix representation of the Hamiltonian.
+
 {
   int ii, jj;
 
@@ -101,9 +102,8 @@ void GENHAM::SparseHamJQ()
                     
           tempod = tempi;
           sj = Bond[T0].second; // Second spin of T0th bond
-        //  tempod ^= (1<<si);   //flips si spin in tempod
-        //  tempod ^= (1<<sj);   //flips sj spin in tempod
           tempod ^= ((1<<sj)+(1<<si));   //flips spins si and sj in tempod
+          
           // first part checks if we're still in Sz=0 sector and second part ... 
           if (BasPos[tempod] > -1 && BasPos[tempod] > ii){ //builds only upper half of matrix
               tempBas.push_back(BasPos[tempod]);
@@ -180,6 +180,4 @@ double GENHAM::HOFFdBondX(const int si, const long bra){
   return valH;
 
 }//HOFFdPart
-
-
 

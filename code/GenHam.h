@@ -13,8 +13,8 @@ class GENHAM{
         int Vdim; //dimenson of reduced Hilbert space
 
         //The sparse matrix represenation of the Hamiltonian
-        vector<vector<long> > PosHam;
-        vector<vector< long double > > ValHam;
+        //vector<vector<long> > PosHam;
+        //vector<vector< long double > > ValHam;
 
         //The Hilbert Space
         vector<long> Basis;
