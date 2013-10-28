@@ -99,6 +99,7 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
         while(Lexit != 1){
 
             iter++;
+            if(iter%5==0){cout<<"Lanczos iteration: "<<EViter << ","<< iter<<endl;}
 
             //****** do V2=H|V1> below ** Big Matrix multiplication.  Do the diags on the fly!!!
             apply(V2, SparseH, V1);
@@ -224,6 +225,7 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
 
 //  return E0;
 
+    cout << "<<Lanczos Complete>>\n";
   return Energy;
 
 }//end Diag

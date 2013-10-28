@@ -49,6 +49,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     xSize = xMax;
     // Iterate over the horizontal cuts
     for(int ySize=1; ySize<=yMax/2; ySize++){
+        cout << "Line term H" << ySize << endl;
 
         // Get the dimensions of region A and B;
         // states don't necessarily have Sz=0 in their regions 
@@ -127,6 +128,8 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     // Iterate over the vectical cuts
     for(int xSize=1; xSize<=xMax/2; xSize++){
 
+        cout << "Line term V" << xSize << endl;
+
         // Get the dimensions of region A and B;
         Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
         Bdim = regionDim_NA_N(Nsite - xSize*ySize, Nsite, Bbasis, BbasPos);
@@ -201,6 +204,9 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     // Iterate over the corner cuts
     for(int ySize=1; ySize<yMax; ySize++){
         for(int xSize=1; xSize<xMax; xSize++){
+            
+            cout << "Corner term " << ySize*xSize << endl;
+
             // Get the dimensions of region A and B;
             Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
             Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
