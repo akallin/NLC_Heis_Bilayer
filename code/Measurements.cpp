@@ -30,7 +30,7 @@ using namespace std;
 int main(int argc, char** argv){
 
     int CurrentArg = 1;
-    string InputFile;
+    string InputFile = "2x11rect.dat"; 
     string OutputFile = "output_2d.dat";
     double alpha = 0;
 
