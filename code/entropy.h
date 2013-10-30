@@ -71,7 +71,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
         cout << ".... Supermat created" << endl;
 
         // Loop over all the basis states
-        cout << "Looping over basis states\n";
+        cout << "Looping over basis states" << endl;
 
         for(int i=0; i<Dim; i++){      
             // extractifying the region A and region B states
@@ -121,7 +121,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
 
             SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
         }
-        cout << "   ... Supermat filled\n";
+        cout << "   ... Supermat filled" << endl;
 
         // ------ GET ENTROPY!!! ------
         getEE(alpha1, tempEnt, SuperMat);
@@ -198,7 +198,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
             // Unshift bState by 1 (because there was one extra)
             bState = bState>>1;
 
-            if(AbasPos[aState]<0 || BbasPos[bState]<0){ cout << "SUPER ERROR!\n"; exit(1);}
+            if(AbasPos[aState]<0 || BbasPos[bState]<0){ cout << "SUPER ERROR!" << endl; exit(1);}
             SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
         }
 
@@ -274,7 +274,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
                 // Unshift bState by 1 (because there was one extra)
                 bState = bState>>1;
 
-                if(AbasPos[aState]<0 || BbasPos[bState]<0){ cout << "SUPER ERROR!\n"; exit(1);}
+                if(AbasPos[aState]<0 || BbasPos[bState]<0){ cout << "SUPER ERROR! " << endl; exit(1);}
                 SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
             }
 
@@ -358,15 +358,15 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
     double temp(0);
     int Dim(0);
 
-    cout << "Getting EE\n";
+    cout << "Getting EE" << endl;
     // Using SuperMat to get the density matrix
     // If Adim > Bdim TRANSPOSE!!
     if(SuperMat.size()>SuperMat[0].size()){
         Dim = SuperMat[0].size();
         //DM.resize(Dim,Dim);
-        cout << "creating DM ... ";
+        cout << "creating DM ... " << endl;
         DM= new double[Dim*Dim];  //This is a c-style array
-        cout << "DM created\n";
+        cout << "DM created " << endl;
 
         for(int i=0; i<Dim; i++){
             for(int j=i; j<Dim; j++){
@@ -378,15 +378,15 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
                 DM[i*Dim + j] = temp; //matrix is symmetric
             }
         }
-        cout << "DM filled\n";
+        cout << "DM filled" << endl;
     }
     // Otherwise, use Adim
     else{
         Dim = SuperMat.size();
         //DM.resize(Dim,Dim);
-         cout << "creating DM ... \n";
+         cout << "creating DM ... " << endl;
         DM= new double[Dim*Dim];  //This is a c-style array
- cout << "DM created\n";
+ cout << "DM created" << endl;
 
         for(int i=0; i<Dim; i++){
             for(int j=i; j<Dim; j++){
@@ -398,7 +398,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
                 DM[i*Dim + j] = temp; //matrix is symmetric
             }
         }
-         cout << "DM filled\n";
+         cout << "DM filled" << endl;
     }
 
     // Eigenvalues of the RDM get put in dd
@@ -406,9 +406,9 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
 
     //Diagonalizing the RDM
     while(dd.size()>0){dd.erase(dd.begin());}
-    cout << "Beginning diagonalization\n";
+    cout << "Beginning diagonalization" << endl;
     diagWithLapack_R(DM,dd,Dim,Dim);
-    cout << "Diagonalization complete\n";
+    cout << "Diagonalization complete " << endl;
 
     //clean up DM, unless you need it anywhere below
     delete [] DM;
@@ -417,7 +417,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
     double vN(0), renyi(0); 
     temp=0;
 
-    cout << "calculating renyis \n";
+    cout << "calculating renyis " << endl;
     for(int a=0; a<alpha2.size(); a++){
         EE=0;
         vN=0;
@@ -445,7 +445,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
 
         CornLineEnts[a] = EE;
     }
-    cout << "EE complete\n";
+    cout << "EE complete" << endl;
 }//End of getEE
 
 #endif
