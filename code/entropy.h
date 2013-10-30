@@ -55,6 +55,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
         // Get the dimensions of region A and B;
         // states don't necessarily have Sz=0 in their regions 
         // if NA > N/2 or NB > N/2
+        cout << "before Adim\n";
         Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
         cout << "Adim = " << Adim;
         Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
