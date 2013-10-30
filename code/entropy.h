@@ -393,6 +393,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
                 temp=0;
                 for(int k=0; k<SuperMat[0].size(); k++){
                     temp += SuperMat[i][k]*SuperMat[j][k];
+                    if((i%100==0) && (j%100==0)){ cout << i << ","<<j<<endl;}
                 }
                 DM[j*Dim + i] = temp;            
                 DM[i*Dim + j] = temp; //matrix is symmetric
