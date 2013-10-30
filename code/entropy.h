@@ -50,24 +50,25 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     // Iterate over the horizontal cuts
     // YSIZE SHOULD START AT 1. CHANGED FOR TESTING ON THORN!!!!_____!!!!!
     for(int ySize=4; ySize<=yMax/2; ySize++){
-        cout << "Line term H" << ySize << endl;
+        cout << "Line term H" << ySize << endl << "check!!!!";
 
         // Get the dimensions of region A and B;
         // states don't necessarily have Sz=0 in their regions 
         // if NA > N/2 or NB > N/2
-        cout << "before Adim\n";
+        cout << "before Adim " << endl;
+
         Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
-        cout << "Adim = " << Adim;
+        cout << "Adim = " << Adim << endl;
         Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
-        cout << "  Bdim = " << Bdim;
+        cout << "  Bdim = " << Bdim << endl;
         //cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
 
         // Initialize the matrix of eigenvalues
-        cout << "\nInitialize Supermat\n";
+        cout << "Initialize Supermat" << endl;
         SuperMat.clear();
         SuperMat.resize(Adim);
         for(int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
-        cout << ".... Supermat created\n";
+        cout << ".... Supermat created" << endl;
 
         // Loop over all the basis states
         cout << "Looping over basis states\n";
