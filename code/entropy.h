@@ -361,7 +361,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
     cout << "Getting EE" << endl;
     // Using SuperMat to get the density matrix
     // If Adim > Bdim TRANSPOSE!!
-    if(SuperMat.size()>SuperMat[0].size()){
+    if(SuperMat.size()>=SuperMat[0].size()){
         Dim = SuperMat[0].size();
         //DM.resize(Dim,Dim);
         cout << "creating DM ... " << endl;
@@ -384,9 +384,9 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
     else{
         Dim = SuperMat.size();
         //DM.resize(Dim,Dim);
-         cout << "creating DM ... " << endl;
+        cout << "creating DM ... " << endl;
         DM= new double[Dim*Dim];  //This is a c-style array
- cout << "DM created" << endl;
+        cout << "DM created" << endl;
 
         for(int i=0; i<Dim; i++){
             for(int j=i; j<Dim; j++){
@@ -398,7 +398,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
                 DM[i*Dim + j] = temp; //matrix is symmetric
             }
         }
-         cout << "DM filled" << endl;
+        cout << "DM filled" << endl;
     }
 
     // Eigenvalues of the RDM get put in dd
