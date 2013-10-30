@@ -48,22 +48,29 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     // -*-*-*-*-*-*-*- Horizontal -*-*-*-*-*-*-*-
     xSize = xMax;
     // Iterate over the horizontal cuts
-    for(int ySize=1; ySize<=yMax/2; ySize++){
+    // YSIZE SHOULD START AT 1. CHANGED FOR TESTING ON THORN!!!!_____!!!!!
+    for(int ySize=4; ySize<=yMax/2; ySize++){
         cout << "Line term H" << ySize << endl;
 
         // Get the dimensions of region A and B;
         // states don't necessarily have Sz=0 in their regions 
         // if NA > N/2 or NB > N/2
         Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
+        cout << "Adim = " << Adim;
         Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
+        cout << "  Bdim = " << Bdim;
         //cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
 
         // Initialize the matrix of eigenvalues
+        cout << "\nInitialize Supermat\n";
         SuperMat.clear();
         SuperMat.resize(Adim);
         for(int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
+        cout << ".... Supermat created\n";
 
         // Loop over all the basis states
+        cout << "Looping over basis states\n";
+
         for(int i=0; i<Dim; i++){      
             // extractifying the region A and region B states
             tempState = Basis[i];
@@ -112,6 +119,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
 
             SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
         }
+        cout << "   ... Supermat filled\n";
 
         // ------ GET ENTROPY!!! ------
         getEE(alpha1, tempEnt, SuperMat);
@@ -348,12 +356,15 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
     double temp(0);
     int Dim(0);
 
+    cout << "Getting EE\n";
     // Using SuperMat to get the density matrix
     // If Adim > Bdim TRANSPOSE!!
     if(SuperMat.size()>SuperMat[0].size()){
         Dim = SuperMat[0].size();
         //DM.resize(Dim,Dim);
+        cout << "creating DM ... ";
         DM= new double[Dim*Dim];  //This is a c-style array
+        cout << "DM created\n";
 
         for(int i=0; i<Dim; i++){
             for(int j=i; j<Dim; j++){
@@ -365,12 +376,15 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
                 DM[i*Dim + j] = temp; //matrix is symmetric
             }
         }
+        cout << "DM filled\n";
     }
     // Otherwise, use Adim
     else{
         Dim = SuperMat.size();
         //DM.resize(Dim,Dim);
+         cout << "creating DM ... \n";
         DM= new double[Dim*Dim];  //This is a c-style array
+ cout << "DM created\n";
 
         for(int i=0; i<Dim; i++){
             for(int j=i; j<Dim; j++){
@@ -382,6 +396,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
                 DM[i*Dim + j] = temp; //matrix is symmetric
             }
         }
+         cout << "DM filled\n";
     }
 
     // Eigenvalues of the RDM get put in dd
@@ -389,7 +404,9 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
 
     //Diagonalizing the RDM
     while(dd.size()>0){dd.erase(dd.begin());}
+    cout << "Beginning diagonalization\n";
     diagWithLapack_R(DM,dd,Dim,Dim);
+    cout << "Diagonalization complete\n";
 
     //clean up DM, unless you need it anywhere below
     delete [] DM;
@@ -398,7 +415,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
     double vN(0), renyi(0); 
     temp=0;
 
-
+    cout << "calculating renyis \n";
     for(int a=0; a<alpha2.size(); a++){
         EE=0;
         vN=0;
@@ -426,6 +443,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
 
         CornLineEnts[a] = EE;
     }
+    cout << "EE complete\n";
 }//End of getEE
 
 #endif
