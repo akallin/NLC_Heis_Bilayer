@@ -1,7 +1,7 @@
 # include "Lanczos_07.h"
 #define EVECTS 0  
 
-LANCZOS::LANCZOS(const int Dim_) : Dim (Dim_)
+LANCZOS::LANCZOS(const long unsigned int Dim_) : Dim (Dim_)
 {
   STARTIT = 5; //I always make sure to start with at least 5 iterations (but see line 159...)
   CONV_PREC = 1E-10; //The precision with which we converge to
@@ -21,7 +21,7 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
     V1.resize(Dim);  
     V2.resize(Dim);
 
-    int ii;
+    long unsigned int ii;
     int iter, MAXiter, EViter;
     int min;
     int Lexit;
@@ -42,9 +42,9 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
     vector<l_double> d(LIT, 0.); 
     vector< vector< l_double> > Hmatrix; //this is a vector of vectors... wise?
     Hmatrix.resize(LIT);
-    for( int ii = 0; ii < LIT; ii++)
+    for( int i = 0; i < LIT; i++)
     {
-        Hmatrix[ii].resize(LIT);
+        Hmatrix[i].resize(LIT);
     }
 
   
@@ -56,7 +56,7 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
         V0.assign(Dim, 0.0);
         //V0[ 0 ] = 1.0;
         if( V0.size() == 4) V0[1] = 1.0;
-        for (unsigned int vi=0; vi < V0.size(); vi++) 
+        for (unsigned long int vi=0; vi < V0.size(); vi++) 
         { 
             //V0[vi] = 1.0;
             if (vi == V0.size() - 1 && V0.size() != 4) V0[vi] = 1.0;
@@ -136,7 +136,7 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
                 //---determin vector (value) of minimal eigenvectors
                 Ord.assign(Neigen,999.0); //initialize
                 min = 0;
-                for (unsigned int oo=0; oo<Ord.size(); oo++) 
+                for (long unsigned int oo=0; oo<Ord.size(); oo++) 
                 {
                     if ( d[0] < Ord[oo] ) {
                         Ord.insert(Ord.begin() + oo, d[0]);
@@ -146,7 +146,7 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
                 }
                 for (ii=1;ii<=iter;ii++){
                     if (d[ii] < d[min])  min = ii;
-                    for (unsigned int o=0; o<Ord.size(); o++) {
+                    for (long unsigned int o=0; o<Ord.size(); o++) {
                         if ( d[ii] < Ord[o] ) {
                             Ord.insert(Ord.begin() + o, d[ii]);
                             Ord.pop_back();
@@ -198,7 +198,7 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
         }
         e[iter] = 0;
         //calculate eigenvector
-        for ( unsigned int kk = 0; kk < Hmatrix.size(); kk++) Hmatrix[kk].assign(LIT, 0.l);
+        for ( long unsigned int kk = 0; kk < Hmatrix.size(); kk++) Hmatrix[kk].assign(LIT, 0.l);
         for ( ii = 0; ii <= iter; ii++) Hmatrix[ii][ii] = 1.l; //identity matrix
         nn = iter+1;
         rtn = tqli2(d,e,nn,Hmatrix,1);
@@ -233,15 +233,16 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
 /*********************************************************************/
 void LANCZOS::apply(vector< l_double > & U, const GENHAM& H, const vector< l_double > & V)  //apply H to |V>
 {
-    int kk;
+    long unsigned int kk;
     double J=1; //Note i'm not actually using the proper J here!
     U.assign(U.size(), 0.);
     l_double Hdiag=0;
-    int bra=-1;
-    int flip=-1;
-    int T0,T1,S0b,S1b;
+    long unsigned int bra=-1;
+    long unsigned int flip=-1;
+    long unsigned int T0,T1;
+    unsigned int S0b,S1b;
 
-    for (int ii = 0; ii < Dim; ii++) 
+    for (long unsigned int ii = 0; ii < Dim; ii++) 
     {
         Hdiag=0;
         bra = H.Basis[ii];
@@ -286,7 +287,7 @@ void LANCZOS::apply(vector< l_double > & U, const GENHAM& H, const vector< l_dou
 void LANCZOS::Normalize(vector<l_double>& V) //Normalize the input vector (length N)
 {
   l_double norm;
-  unsigned int i;
+  long unsigned int i;
 
   norm = 0.0;             
   for (i=0; i<V.size(); i++) norm += V[i]*V[i]; //  <V|V>

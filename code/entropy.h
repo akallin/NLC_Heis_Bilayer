@@ -3,11 +3,10 @@
 #define entropy_H
 
 void getEE( vector <double>& alpha1, vector <double>& CornLineEnts, vector< vector<double> >& SuperMat );
-unsigned int full_hilb( unsigned na );
-unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long> &Abasis, vector<long> &AbasPos );
+long unsigned int regionDim_NA_N( unsigned int na, unsigned int n, vector<unsigned long int> &Abasis, vector<unsigned long int> &AbasPos );
 
 inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< pair<double,double> >& ents, 
-        vector< vector< int > >& RScoords, vector <long> Basis){
+        vector< vector< int > >& RScoords, vector <long unsigned int> Basis){
 
     // Get the graph dimensions from the realspace coordinates
     int xMax = RScoords.size();
@@ -15,20 +14,21 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     int Nsite = xMax*yMax;
 
     // The dimension is number of eigenvalues
-    long int Dim = eigs.size();
+    long unsigned int Dim = eigs.size(); // long needed if we go to... 34 sites (34_C_17 > 2^31)
 
     // The dimensions of region A/B. 
-    int xSize(0), ySize(0), Adim, Bdim;
-    vector <long> Abasis, Bbasis, AbasPos, BbasPos;
+    unsigned int xSize(0), ySize(0); 
+    long unsigned int Adim, Bdim; // could require long
+    vector <long unsigned int> Abasis, Bbasis, AbasPos, BbasPos;
 
     // A rectangular matrix containing the eigenvalues, used to get the RDM
     vector< vector<double > > SuperMat;
 
     // Some temp variables;
-    int tempState(-1);         // The current full basis state we're looking at
+    long unsigned int tempState(-1);         // The current full basis state we're looking at
     int tempSpin(-1);          // The number of the spin that's currently being extracted
     int spinState(-1);         // The state of that spin
-    int aState(0), bState(0);  // The basis states for reg A and B extracted from the full basis
+    long unsigned int aState(0), bState(0);  // The basis states for reg A and B extracted from the full basis
     vector <double> tempEnt;
 
     // make the entropy vector a nonzero size
@@ -48,8 +48,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     // -*-*-*-*-*-*-*- Horizontal -*-*-*-*-*-*-*-
     xSize = xMax;
     // Iterate over the horizontal cuts
-    // YSIZE SHOULD START AT 1. CHANGED FOR TESTING ON THORN!!!!_____!!!!!
-    for(int ySize=4; ySize<=yMax/2; ySize++){
+    for(int ySize=1; ySize<=yMax/2; ySize++){
         cout << "Line term H" << ySize << endl << "check!!!!";
 
         // Get the dimensions of region A and B;
@@ -67,13 +66,13 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
         cout << "Initialize Supermat" << endl;
         SuperMat.clear();
         SuperMat.resize(Adim);
-        for(int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
+        for(long unsigned int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
         cout << ".... Supermat created" << endl;
 
         // Loop over all the basis states
         cout << "Looping over basis states" << endl;
 
-        for(int i=0; i<Dim; i++){      
+        for(long unsigned int i=0; i<Dim; i++){      
             // extractifying the region A and region B states
             tempState = Basis[i];
 
@@ -148,10 +147,10 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
         // Initialize the matrix of eigenvalues
         SuperMat.clear();
         SuperMat.resize(Adim);
-        for(int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
+        for(long unsigned int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
 
         // Loop over all the basis states
-        for(int i=0; i<Dim; i++){      
+        for(long unsigned int i=0; i<Dim; i++){      
             // extractifying the region A and region B states
             tempState = Basis[i];
 
@@ -224,10 +223,10 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
             // Initialize the matrix of eigenvalues
             SuperMat.clear();
             SuperMat.resize(Adim);
-            for(int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
+            for(long unsigned int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
 
             // Loop over all the basis states
-            for(int i=0; i<Dim; i++){      
+            for(long unsigned int i=0; i<Dim; i++){      
                 // extractifying the region A and region B states
                 tempState = Basis[i];
 
@@ -294,12 +293,12 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
    |  *  na - the number of sites in A                                                               |
    |  *  n  - the total number of sites                                                              |
    -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*- */
-unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vector<long>& basPosm )
+long unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long unsigned int>& basism, vector<long unsigned int>& basPosm )
 {
-    int full_dim = full_hilb(na);
+    long unsigned int full_dim = 1<<na; 
     basPosm.clear();
     basPosm.resize(full_dim,-99);
-    unsigned int dimm;
+    long unsigned int dimm;
     basism.clear();
     basism.resize(0);
 
@@ -319,8 +318,8 @@ unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vect
     // Otherwise Dim is more complicated!
     else{
         dimm = 0;
-        int temp(0);
-        for (unsigned long i1=0; i1<full_dim; i1++) 
+        long unsigned int temp(0);
+        for (unsigned long int i1=0; i1<full_dim; i1++) 
         {
             temp = 0;
             for (int sp =0; sp<na; sp++)
@@ -339,16 +338,6 @@ unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long>& basism, vect
 
 
 /* -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-   full_hilb - calculates 2^na given na
-   -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*- */
-unsigned int full_hilb( unsigned na ){
-    unsigned int result = 1;
-    for(int i=0; i<na; i++) result *=2;
-    return result;
-}//End of full_hilb
-
-
-/* -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
    getEE
    -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*- */
 void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vector<double> >& SuperMat ){
@@ -356,20 +345,23 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
     double *DM; //create a pointer to a c-style array
 
     double temp(0);
-    int Dim(0);
+    long int Dim(0);
+    long int Dim_sq;
 
     cout << "Getting EE" << endl;
     // Using SuperMat to get the density matrix
     // If Adim > Bdim TRANSPOSE!!
     if(SuperMat.size()>=SuperMat[0].size()){
         Dim = SuperMat[0].size();
+        cout << "Dim = " << Dim << "  Dim*Dim = " << Dim*Dim << endl;
         //DM.resize(Dim,Dim);
         cout << "creating DM ... " << endl;
-        DM= new double[Dim*Dim];  //This is a c-style array
+        Dim_sq = Dim*Dim;
+        DM= new double[Dim_sq];  //This is a c-style array
         cout << "DM created " << endl;
 
-        for(int i=0; i<Dim; i++){
-            for(int j=i; j<Dim; j++){
+        for(long int i=0; i<Dim; i++){
+            for(long int j=i; j<Dim; j++){
                 temp=0;
                 for(int k=0; k<SuperMat.size(); k++){
                     temp += SuperMat[k][i]*SuperMat[k][j];
@@ -377,6 +369,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
                 DM[j*Dim + i] = temp; 
                 DM[i*Dim + j] = temp; //matrix is symmetric
             }
+            if(i%265==0){cout<<"i = " << i << endl;}
         }
         cout << "DM filled" << endl;
     }
@@ -385,15 +378,15 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
         Dim = SuperMat.size();
         //DM.resize(Dim,Dim);
         cout << "creating DM ... " << endl;
-        DM= new double[Dim*Dim];  //This is a c-style array
+        Dim_sq = Dim*Dim;
+        DM= new double[Dim_sq];  //This is a c-style array
         cout << "DM created" << endl;
 
-        for(int i=0; i<Dim; i++){
-            for(int j=i; j<Dim; j++){
+        for(long int i=0; i<Dim; i++){
+            for(long int j=i; j<Dim; j++){
                 temp=0;
-                for(int k=0; k<SuperMat[0].size(); k++){
+                for(long int k=0; k<SuperMat[0].size(); k++){
                     temp += SuperMat[i][k]*SuperMat[j][k];
-                    if((i%100==0) && (j%100==0)){ cout << i << ","<<j<<endl;}
                 }
                 DM[j*Dim + i] = temp;            
                 DM[i*Dim + j] = temp; //matrix is symmetric
@@ -408,7 +401,8 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
     //Diagonalizing the RDM
     while(dd.size()>0){dd.erase(dd.begin());}
     cout << "Beginning diagonalization" << endl;
-    diagWithLapack_R(DM,dd,Dim,Dim);
+    int drim = Dim;
+    diagWithLapack_R(DM,dd,drim,drim);
     cout << "Diagonalization complete " << endl;
 
     //clean up DM, unless you need it anywhere below

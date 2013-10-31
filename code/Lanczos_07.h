@@ -24,10 +24,10 @@ typedef double l_double;  //precision for lanczos
 class LANCZOS{
 
   public:
-    int Dim; //dimension 
+    long unsigned int Dim; //dimension 
 
    //Methods
-   LANCZOS(const int);
+   LANCZOS(const long unsigned int);
    double Diag(const GENHAM &, const int, const int, vector< l_double > &);
    void tred3(vector< vector<double> >& , vector<double>& , vector<double>& e, const int );
 

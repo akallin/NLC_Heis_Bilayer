@@ -10,15 +10,15 @@ using namespace std;
 class GENHAM{
 
     public:
-        int Vdim; //dimenson of reduced Hilbert space
+        unsigned long int Vdim; //dimenson of reduced Hilbert space
 
         //The sparse matrix represenation of the Hamiltonian
         //vector<vector<long> > PosHam;
         //vector<vector< long double > > ValHam;
 
         //The Hilbert Space
-        vector<long> Basis;
-        vector<long> BasPos;
+        vector<unsigned long> Basis;
+        vector<unsigned long> BasPos;
 
         //The constructor
         GENHAM(const int N_ ,const long double J_, const long double Jh_, 
