@@ -30,7 +30,7 @@ using namespace std;
 int main(int argc, char** argv){
 
     int CurrentArg = 1;
-    string InputFile = "2x11rect.dat"; 
+    string InputFile = "3x3square.dat"; 
     string OutputFile = "output_2d.dat";
     double alpha = 0;
 
@@ -59,7 +59,7 @@ int main(int argc, char** argv){
     double Jperp;
 
     J=prm.JJ_;
-    Jperp=prm.hh_;
+    Jperp=prm.Jperp_;
 
     //eigenvector
     vector<l_double> eVec;
@@ -81,8 +81,7 @@ int main(int argc, char** argv){
     //fout.precision(10);
     cout.precision(10);
 
-    J=1;     
-
+    // The Jperp values to use
     const int numJperpVals = 1;
     double Jperpvals[numJperpVals] = {1};
 
@@ -109,9 +108,11 @@ int main(int argc, char** argv){
         Jperp = Jperpvals[Jp];
 
 
-        //------------ All the *real* graphs-----------
+        // Loop over all the fileGraphs ------------ 
         for (int i=0; i<fileGraphs.size(); i++){
 
+            // Special Case for 1-site, 2-site, 3-site graphs
+            // Change this for the bilayer case
             if(fileGraphs.at(i).NumberSites<=3){
 
                 if(fileGraphs.at(i).NumberSites==1){
@@ -148,16 +149,18 @@ int main(int argc, char** argv){
                     }
                 }
             }
-
+            // All the graphs w/ >3 sites
             else{
                 //---Generate the Hamiltonian---
                 GENHAM HV(fileGraphs.at(i).NumberSites,J,Jperp,fileGraphs.at(i).AdjacencyList); 
 
-                LANCZOS lancz(HV.Vdim);  //dimension of Hilbert space
+                // Doesn't do anything really
+                LANCZOS lancz(HV.Vdim);  //dimension of Hilbert space 
                 //HV.SparseHamJQ();  //generates sparse matrix Hamiltonian for Lanczos
 
                 //---------- Diagonalize and get Eigenvector -------
                 energy = lancz.Diag(HV, 1, prm.valvec_, eVec); // Hamiltonian, # of eigenvalues to converge, 1 for -values only, 2 for vals AND vectors
+                cout << "energy = " << energy << "  eVec size = " << eVec.size() << endl;
                 HV.BasPos.resize(0);
                 Entropy2D(alphas, eVec, entVec, fileGraphs.at(i).RealSpaceCoordinates, HV.Basis);
             }

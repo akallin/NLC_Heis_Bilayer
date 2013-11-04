@@ -49,15 +49,13 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     xSize = xMax;
     // Iterate over the horizontal cuts
     for(int ySize=1; ySize<=yMax/2; ySize++){
-        cout << "Line term H" << ySize << endl << "check!!!!";
+        cout << "Line term H" << ySize;
 
         // Get the dimensions of region A and B;
         // states don't necessarily have Sz=0 in their regions 
         // if NA > N/2 or NB > N/2
-        cout << "before Adim " << endl;
-
         Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
-        cout << "Adim = " << Adim << endl;
+        cout << "    Adim = " << Adim;
         Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
         cout << "  Bdim = " << Bdim << endl;
         //cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
@@ -391,6 +389,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
                 DM[j*Dim + i] = temp;            
                 DM[i*Dim + j] = temp; //matrix is symmetric
             }
+            if(i%265==0){cout<<"i = " << i << endl;}
         }
         cout << "DM filled" << endl;
     }

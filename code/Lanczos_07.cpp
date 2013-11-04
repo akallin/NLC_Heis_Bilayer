@@ -6,7 +6,6 @@ LANCZOS::LANCZOS(const long unsigned int Dim_) : Dim (Dim_)
   STARTIT = 5; //I always make sure to start with at least 5 iterations (but see line 159...)
   CONV_PREC = 1E-10; //The precision with which we converge to
 
-
 }//constructor
 
 
