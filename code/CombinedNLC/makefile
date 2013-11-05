@@ -1,15 +1,15 @@
-OBJS = Measurements.cpp GenHam_Heis.o  Lanczos_07.o lapack.o graphs.o 
+OBJS = NLC_2D_EE.cpp GenHam_Heis.o  Lanczos_07.o lapack.o graphs.o 
 CC = g++
-CFLAGS = -g -O2 
+CFLAGS = -O2 
 #CFLAGS = -O2 -arch x86_64
 #LIBS = -lm -framework veclib
 LIBS = -framework Accelerate
 
 2dEE.out: $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o 2dmeas.out $(LIBS)
+	$(CC) $(CFLAGS) $(OBJS) -o 2dEE.out $(LIBS)
 
-Measurements.o : Measurements.cpp GenHam.h Lanczos_07.h lapack.h simparam.h 
-	$(CC) $(CFLAGS) -c Measurements.cpp
+NLC_2D_EE.o : NLC_2D_EE.cpp GenHam.h Lanczos_07.h lapack.h simparam.h 
+	$(CC) $(CFLAGS) -c NLC_1D_TFIM.cpp
 
 GenHam_Heis.o: GenHam_Heis.cpp GenHam.h Lanczos_07.h entropy.h
 	$(CC) $(CFLAGS) -c GenHam_Heis.cpp

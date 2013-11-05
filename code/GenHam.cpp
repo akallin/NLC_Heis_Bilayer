@@ -1,49 +1,65 @@
 #include "GenHam.h"
 
 //----------------------------------------------------------
-GENHAM::GENHAM(const int Ns, const long double J_, const long double h_, vector <pair<int,int> > BBond_, bool Field, double mag_)  
+GENHAM::GENHAM(const int Ns, const long double J_, const long double h_, vector <pair<int,int> > BBond_)  
 //create bases and determine dim of full Hilbert space
 {
 
   hh = h_;
   JJ = J_;
+  //the adjacency list read in from the graph file(s) (See main cpp file)
   Bond = BBond_;
   unsigned int Dim;
   Nsite = Ns;
-  LowField = Field;
-  Mag = mag_;
 
-  if( !LowField ) ConnectCount.resize(Ns, 0);
+  // If using the highfield expansion then there are Ns sites
+  // ConnectCount stores the number of connections per site
+  ConnectCount.resize(Ns, 0);
+
+  // For LowField ....
   else{
     int max = 0;
+
+    //loop through all the bonds.
     for (unsigned int CurrentBond = 0; CurrentBond < BBond_.size(); CurrentBond++)
     {
-        max = (BBond_[CurrentBond].first > max) ? BBond_[CurrentBond].first : max;
-        max = (BBond_[CurrentBond].second > max) ? BBond_[CurrentBond].second : max;
+      //if the first site of the current bond is greater than max: set max equal to that, otherwise leave max at the same value;
+      max = (BBond_[CurrentBond].first > max) ? BBond_[CurrentBond].first : max;
+
+      //same deal for the second site of the bonds
+      max = (BBond_[CurrentBond].second > max) ? BBond_[CurrentBond].second : max;
     }
+
+    //there are max+1 sites?
     ConnectCount.resize(max + 1, 0);
     Nsite = max + 1;
   }
 
+
+  //ConnectCount counts the number of connections for each site
   for (unsigned int CurrentBond = 0; CurrentBond < Bond.size(); CurrentBond++)
   {
     ConnectCount[Bond[CurrentBond].first]++;
     ConnectCount[Bond[CurrentBond].second]++;
   }
 
+  //Calculates the total dimension of the Hilbert space for Nsite spins
+  //** Gound to need to double Nsite for the bilayer
   Dim = 2;  //  S=1/2 models : two states
   for (int ch = 1; ch < Nsite; ch++) Dim *= 2;
 
   BasPos.resize(Dim, -1); //initialization 
   Basis.resize(Dim);
   Vdim=0;
-  unsigned long temp;    //create basis (16 site cluster)
+  unsigned long temp;    //create basis
 
+  // this is the *Full* Sz basis.  For Heisenberg groundstate we only need Sz = 0 sector
   for (unsigned int i1 = 0; i1 < Dim; i1++) 
   {
       temp = 0;
       for (int sp = 0; sp < Nsite; sp++){ temp += (i1>>sp)&1; } //unpack bra
       Basis[ i1 ] = i1;
+      // The i1th basis state is labeled i1 (this will change for Sz=0 only basis)
       BasPos.at( i1 ) = i1;
       Vdim++;
   }//Dim
@@ -81,9 +97,11 @@ void GENHAM::SparseHamJQ()
   int si;
   double tempD;
 
+  // Loop through all the basis states (all spin sectors)
   for (unsigned int ii=0; ii<Basis.size(); ii++){
     tempH.clear(); 
     tempBas.clear();
+
 
     tempi = Basis.at(ii);
     tempBas.push_back(0); //first element (Row size)
@@ -91,7 +109,7 @@ void GENHAM::SparseHamJQ()
 
     //-----1:   diagonal 
     tempBas.push_back(BasPos.at(tempi));  
-    tempD = (*this).HdiagPart(tempi,Nsite);
+    tempD = (*this).HdiagPart(tempi,Nsite); //tempD = address of GENHAM.Hdiagpart(i,j)
     tempH.push_back(tempD); 
 
     for (int T0=0; T0<Nsite; T0++){ //T0 is your square index
@@ -101,7 +119,7 @@ void GENHAM::SparseHamJQ()
       //-----2:   first bond (Horizontal)
       tempod = tempi;
       // sj = Bond(T0,1); 
-      tempod = tempod^(1<<si);   //toggle bit 
+      tempod = tempod^(1<<si);   //flips the si spin in tempod 
 
       if (BasPos.at(tempod) > ii){ //build only upper half of matrix
         tempBas.push_back(BasPos.at(tempod));
@@ -164,16 +182,6 @@ double GENHAM::HdiagPart(const long bra, int Sites){
   S0b = (bra>>T0)&1;
   S1b = (bra>>T1)&1;
   
-  if(LowField){ 
-    //valH += -JJ*2*((S0b-0.5) + (S1b-0.5)); 
-    for(unsigned int i = 0; i < ConnectCount.size(); i++)
-      {
-        valH += Mag*(4 - ConnectCount[i])*2*(-JJ)*( ((bra>>i)&1) - 0.5);
-      }
-    
-  }
-
-
   return valH;
 
 }//HdiagPart

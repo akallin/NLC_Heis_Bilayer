@@ -1,6 +1,7 @@
 //Lanczos_07.h
 //c++ class for performing a Lanczos diagonalization
-//Roger Melko, November 2007
+//Roger Melko, November 2007 - Blitz++ removed by K. Hyatt, 2012.  
+//Modified for NLCE May 2013 - R. Melko
 
 #ifndef LANCZOS_07
 #define LANCZOS_07
@@ -15,37 +16,28 @@
 #include <vector>
 using namespace std;
 
-#include <blitz/array.h>
-BZ_USING_NAMESPACE(blitz)
-
 #include "GenHam.h"
 
-typedef long double l_double;  //precision for lanczos
+//typedef long double l_double;  //precision for lanczos
+typedef double l_double;  //precision for lanczos
 
 class LANCZOS{
 
   public:
-    //Data
-    int Dim; //dimension
-    //    Array<l_double,1> Psi;  //eigenvector
+    long unsigned int Dim; //dimension 
 
    //Methods
-   LANCZOS(const int);
-   double Diag(const GENHAM&, const int, const int, Array<l_double,1>&);
-   void tred3(Array<double,2>& , Array<double,1>& , Array<double,1>& e, const int );
-
+   LANCZOS(const long unsigned int);
+   double Diag(const GENHAM &, const int, const int, vector< l_double > &);
+   void tred3(vector< vector<double> >& , vector<double>& , vector<double>& e, const int );
 
   private:
-   int STARTIT;
-   long double CONV_PREC; //convergence precision
+   int STARTIT;  //how many iterations to "always" perform
+   l_double CONV_PREC; //convergence precision
 
-   Array<l_double,1> V0;  
-   Array<l_double,1> V1;    //Ground state vector
-   Array<l_double,1> V2;
-
-   void apply(Array<l_double,1>&, const GENHAM&, const Array<l_double,1>&);  //apply H to |V>
-   void Normalize(Array<l_double,1>& );
-   int tqli2(Array<l_double,1>& , Array<l_double,1>& , int , Array<l_double,2>& , const int );
+   void apply( vector<l_double> &, const GENHAM &, const vector<l_double>&);  //apply H to |V>
+   void Normalize(vector<l_double>& );
+   int tqli2(vector<l_double>& , vector<l_double>& , int , vector< vector<l_double > > & , const int );
 
 }; //LANCZOS class
 
