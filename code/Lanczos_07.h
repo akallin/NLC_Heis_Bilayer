@@ -27,11 +27,13 @@ class LANCZOS{
     long unsigned int Dim; //dimension 
 
    //Methods
-   LANCZOS(const long unsigned int);
+   LANCZOS(const long unsigned int, const double J, const double Jperp, const unsigned int Nsite);
    double Diag(const GENHAM &, const int, const int, vector< l_double > &);
    void tred3(vector< vector<double> >& , vector<double>& , vector<double>& e, const int );
 
   private:
+   const double J, Jperp, Nsite;
+
    int STARTIT;  //how many iterations to "always" perform
    l_double CONV_PREC; //convergence precision
 

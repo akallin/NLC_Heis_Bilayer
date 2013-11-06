@@ -21,8 +21,7 @@ class GENHAM{
         vector<unsigned long> BasPos;
 
         //The constructor
-        GENHAM(const int N_ ,const long double J_, const long double Jh_, 
-                vector < pair<int,int> > BBond_); 
+        GENHAM(const int N_ , vector < pair<int,int> > BBond_); 
 
         void printg();
 

@@ -1,9 +1,9 @@
 /*******************************************************************
-  NLCE for the Heisenberg Bilayer!
-  ------------------------------------------------------------------
+  NLCE for the Heisenberg Bilayer! 2013
+  -----------------------------------------------------------------
   Linked Cluster Expansion program for the 1D TFIM model
   Roger Melko, Ann Kallin, Katie Hyatt June 2012
-  baesd on a Lanczos code from November 2007, modified 2013
+  based on a Lanczos code from November 2007, modified 2013
  ********************************************************************/
 
 #include <utility>
@@ -54,7 +54,7 @@ int main(int argc, char** argv){
 
     double energy;
 
-    PARAMS prm;  //Read parameters from param.dat  : see simparam.h
+    PARAMS prm;  //Read parameters from simparam.h
     double J;
     double Jperp;
 
@@ -83,7 +83,7 @@ int main(int argc, char** argv){
 
     // The Jperp values to use
     const int numJperpVals = 1;
-    double Jperpvals[numJperpVals] = {1};
+    double Jperpvals[numJperpVals] = {0}; // Uncoupled layers, for now
 
     // The Renyi entropies to measure (if it's not set in commandline)
     vector <double> alphas;
@@ -115,13 +115,16 @@ int main(int argc, char** argv){
             // Change this for the bilayer case
             if(fileGraphs.at(i).NumberSites<=3){
 
+                //Now this is a 2 site graph... will this work?  What if the layers are uncoupled?
                 if(fileGraphs.at(i).NumberSites==1){
+                    //energy depends on Jperp
                     energy=0;
                     for(int a=0; a<numRenyis; a++){
                         entVec[a].first=0;
                         entVec[a].second=0;
                     }
                 }
+                // 4-site graph
                 else if(fileGraphs.at(i).NumberSites==2){
                     energy = -0.75*J;
                     for(int a=0; a<numRenyis; a++){
@@ -133,6 +136,7 @@ int main(int argc, char** argv){
                         entVec[a].second=0;       
                     }
                 }
+                // 6-site graph
                 else{
                     energy = -1.0*J;
                     double eig1(5./6.);
@@ -149,13 +153,13 @@ int main(int argc, char** argv){
                     }
                 }
             }
-            // All the graphs w/ >3 sites
+            // All the graphs w/ >3 sites per layer
             else{
                 //---Generate the Hamiltonian---
-                GENHAM HV(fileGraphs.at(i).NumberSites,J,Jperp,fileGraphs.at(i).AdjacencyList); 
+                GENHAM HV(fileGraphs.at(i).NumberSites,fileGraphs.at(i).AdjacencyList); 
 
                 // Doesn't do anything really
-                LANCZOS lancz(HV.Vdim);  //dimension of Hilbert space 
+                LANCZOS lancz(HV.Vdim,J,Jperp,fileGraphs.at(i).NumberSites);  //dimension of Hilbert space 
                 //HV.SparseHamJQ();  //generates sparse matrix Hamiltonian for Lanczos
 
                 //---------- Diagonalize and get Eigenvector -------

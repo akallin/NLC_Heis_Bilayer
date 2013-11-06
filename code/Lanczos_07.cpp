@@ -1,7 +1,7 @@
 # include "Lanczos_07.h"
 #define EVECTS 0  
 
-LANCZOS::LANCZOS(const long unsigned int Dim_) : Dim (Dim_)
+LANCZOS::LANCZOS(const long unsigned int Dim_, const double J_, const double Jperp_, const unsigned int Nsite_ ) : Dim (Dim_), J (J_), Jperp (Jperp_), Nsite (Nsite_)
 {
   STARTIT = 5; //I always make sure to start with at least 5 iterations (but see line 159...)
   CONV_PREC = 1E-10; //The precision with which we converge to
@@ -233,7 +233,6 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
 void LANCZOS::apply(vector< l_double > & U, const GENHAM& H, const vector< l_double > & V)  //apply H to |V>
 {
     long unsigned int kk;
-    double J=1; //Note i'm not actually using the proper J here!
     U.assign(U.size(), 0.);
     l_double Hdiag=0;
     long unsigned int bra=-1;
@@ -246,16 +245,19 @@ void LANCZOS::apply(vector< l_double > & U, const GENHAM& H, const vector< l_dou
         Hdiag=0;
         bra = H.Basis[ii];
 
-        //Loop through all lattice bonds
+        //Loop through all intra-layer lattice bonds
         for(int b=0; b<H.Bond.size(); b++){
         
-            T0 = H.Bond[b].first; //Location of spin 1
+            // Layer 1 ******************************************
+            T0 = H.Bond[b].first; //Location of spin 1 on Layer 1
             S0b = (bra>>T0)&1;    //Value of spin 1
             
-            T1 = H.Bond[b].second; //Location of spin 2
+            T1 = H.Bond[b].second; //Location of spin 2 on Layer 1
             S1b = (bra>>T1)&1;      //Value of spin 2
-            
-            //Offdiagonal Terms
+
+            Hdiag += J*(S0b-0.5)*(S1b-0.5); //Hamiltonian term for bond b
+
+            // Layer 1 Offdiagonal Terms
             if(S0b^S1b){ //if spins are opposite (10 or 01)
                 flip = bra^((1<<T0)+(1<<T1)); //Flip both spins
                 kk = H.BasPos[flip];
@@ -263,9 +265,46 @@ void LANCZOS::apply(vector< l_double > & U, const GENHAM& H, const vector< l_dou
                 if(ii==kk) cout << "OMG\n";
             }//Offdiag
 
+
+            // Layer 2  ******************************************
+            T0 = H.Bond[b].first + Nsite; //Location of spin 1 on Layer 2
+            S0b = (bra>>T0)&1;    //Value of spin 1
+            
+            T1 = H.Bond[b].second + Nsite; //Location of spin 2 on Layer 2
+            S1b = (bra>>T1)&1;      //Value of spin 2
+
             Hdiag += J*(S0b-0.5)*(S1b-0.5); //Hamiltonian term for bond b
 
+            // Layer 2 Offdiagonal Terms
+            if(S0b^S1b){ //if spins are opposite (10 or 01)
+                flip = bra^((1<<T0)+(1<<T1)); //Flip both spins
+                kk = H.BasPos[flip];
+                U[ii] += J*0.5 * V[kk];
+                if(ii==kk) cout << "OMG\n";
+            }//Offdiag
         }
+
+        // Inter-layer (perp) terms  ***************************
+        for(int v=0; v<Nsite; v++){ 
+            T0 = v;                  //Location of spin 1 on Layer 1
+            S0b = (bra>>T0)&1;       //Value of spin 1
+
+            T1 = v + Nsite;          //Location of spin 2 on Layer 2
+            S1b = (bra>>T1)&1;       //Value of spin 2
+    
+            Hdiag += Jperp*(S0b-0.5)*(S1b-0.5); //Hamiltonian term for bond b
+
+            // Layer 2 Offdiagonal Terms
+            if(S0b^S1b){ //if spins are opposite (10 or 01)
+                flip = bra^((1<<T0)+(1<<T1)); //Flip both spins
+                kk = H.BasPos[flip];
+                U[ii] += Jperp*0.5 * V[kk];
+                if(ii==kk) cout << "OMG\n";
+            }//Offdiag
+
+
+        }
+
         U[ii] += Hdiag * V[ii]; //diagonal terms
 
 

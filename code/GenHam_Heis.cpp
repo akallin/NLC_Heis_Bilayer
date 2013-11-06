@@ -4,16 +4,14 @@
 // In this case, it is the Incomplete Bilayer Heisenberg model
 
 //----------------------------------------------------------
-GENHAM::GENHAM(const int Ns, const long double  J_, const long double J2_, vector <pair<int,int> > BBond_)   
+GENHAM::GENHAM(const int Ns, vector <pair<int,int> > BBond_)   
 //create bases and determine the dimension of the Hilbert space
 {
-  JJ = J_; //heisenberg exchange value
-  JJ2 = J2_; // J2 value (for heis bilayer)
 
   Bond = BBond_;
 
   unsigned int Dim;
-  Nsite = Ns;
+  Nsite = Ns*2; //Doubled for the bilayer!
 
   Dim = 2;  //  S=1/2 models : two states
   for (int ch=1; ch<Nsite; ch++) Dim *=2;
