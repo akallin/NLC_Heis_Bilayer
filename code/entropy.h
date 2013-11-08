@@ -79,6 +79,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
             for(int y=0; y<ySize; y++){
                 for(int x=0; x<xMax; x++){
 
+                    // Layer 1 --------------------------------------
                     // Figure out the spin number given the x,y coords
                     tempSpin = RScoords[x][y];
 
@@ -90,6 +91,20 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
 
                     // Shift the bits by 1 (for the next site)
                     aState = aState<<1;
+
+                    // Layer 2 --------------------------------------
+                    // Figure out the spin number given the x,y coords
+                    tempSpin += Nsite;
+
+                    // Extract the state of tempSpin
+                    spinState = ((tempState&(1<<tempSpin))>>tempSpin);
+
+                    // Add the spin state to region A
+                    aState += spinState;
+
+                    // Shift the bits by 1 (for the next site)
+                    aState = aState<<1;
+
                 }
             }	
             // Unshift aState by 1 (because there was one extra)
@@ -100,8 +115,22 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
             for(int y=ySize; y<yMax; y++){
                 for(int x=0; x<xMax; x++){
 
+                    // Layer 1 --------------------------------------
                     // Figure out the spin number given the x,y coords
                     tempSpin = RScoords[x][y];
+
+                    // Extract the state of tempSpin
+                    spinState = ((tempState&(1<<tempSpin))>>tempSpin);
+
+                    // Add the spin state to region B
+                    bState += spinState;
+
+                    // Shift the bits by 1 (for the next site)
+                    bState = bState<<1;
+
+                    // Layer 2 --------------------------------------
+                    // Figure out the spin number given the x,y coords
+                    tempSpin += Nsite;
 
                     // Extract the state of tempSpin
                     spinState = ((tempState&(1<<tempSpin))>>tempSpin);
@@ -157,6 +186,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
             for(int y=0; y<yMax; y++){
                 for(int x=0; x<xSize; x++){
 
+                    // Layer 1 --------------------------------------
                     // Figure out the spin number given the x,y coords
                     tempSpin = RScoords[x][y];
 
@@ -168,6 +198,20 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
 
                     // Shift the bits by 1 (for the next site)
                     aState = aState<<1;
+
+                    // Layer 2 --------------------------------------
+                    // Figure out the spin number given the x,y coords
+                    tempSpin += Nsite;
+
+                    // Extract the state of tempSpin
+                    spinState = ((tempState&(1<<tempSpin))>>tempSpin);
+
+                    // Add the spin state to region A
+                    aState += spinState;
+
+                    // Shift the bits by 1 (for the next site)
+                    aState = aState<<1;
+
                 }
             }
             // Unshift aState by 1 (because there was one extra)
@@ -178,9 +222,22 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
             for(int y=0; y<yMax; y++){
                 for(int x=xSize; x<xMax; x++){
 
-                    //	  cout << "regionB (" << x << "," << y << ")\n";
+                    // Layer 1 --------------------------------------
                     // Figure out the spin number given the x,y coords
                     tempSpin = RScoords[x][y];
+
+                    // Extract the state of tempSpin
+                    spinState = ((tempState&(1<<tempSpin))>>tempSpin);
+
+                    // Add the spin state to region B
+                    bState += spinState;
+
+                    // Shift the bits by 1 (for the next site)
+                    bState = bState<<1;
+
+                    // Layer 2 --------------------------------------
+                    // Figure out the spin number given the x,y coords
+                    tempSpin += Nsite;
 
                     // Extract the state of tempSpin
                     spinState = ((tempState&(1<<tempSpin))>>tempSpin);
@@ -232,9 +289,22 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
                 aState=0; // Initialize the state in region A
                 for(int y=0; y<ySize; y++){
                     for(int x=0; x<xSize; x++){
-
+                        // Layer 1 --------------------------------------
                         // Figure out the spin number given the x,y coords
                         tempSpin = RScoords[x][y];
+
+                        // Extract the state of tempSpin
+                        spinState = ((tempState&(1<<tempSpin))>>tempSpin);
+
+                        // Add the spin state to region A
+                        aState += spinState;
+
+                        // Shift the bits by 1 (for the next site)
+                        aState = aState<<1;
+
+                        // Layer 2 --------------------------------------
+                        // Figure out the spin number given the x,y coords
+                        tempSpin += Nsite;
 
                         // Extract the state of tempSpin
                         spinState = ((tempState&(1<<tempSpin))>>tempSpin);
@@ -255,6 +325,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
                     for(int x=0; x<xMax; x++){
                         if(y<ySize && x<xSize){ continue; }
 
+                        // Layer 1 --------------------------------------
                         // Figure out the spin number given the x,y coords
                         tempSpin = RScoords[x][y];
 
@@ -266,6 +337,19 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
 
                         // Shift the bits by 1 (for the next site)
                         bState = bState<<1;
+
+                        // Layer 2 --------------------------------------
+                        // Figure out the spin number given the x,y coords
+                        tempSpin += Nsite;
+
+                        // Extract the state of tempSpin
+                        spinState = ((tempState&(1<<tempSpin))>>tempSpin);
+
+                        // Add the spin state to region B
+                        bState += spinState;
+
+                        // Shift the bits by 1 (for the next site)
+                        bState = bState<<1; 
                     }
                 }	
                 // Unshift bState by 1 (because there was one extra)
@@ -291,14 +375,16 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
    |  *  na - the number of sites in A                                                               |
    |  *  n  - the total number of sites                                                              |
    -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*- */
-long unsigned int regionDim_NA_N( unsigned na, unsigned n, vector<long unsigned int>& basism, vector<long unsigned int>& basPosm )
+long unsigned int regionDim_NA_N( unsigned na1, unsigned n1, vector<long unsigned int>& basism, vector<long unsigned int>& basPosm )
 {
+    unsigned na(2*na1), n(2*n1);
     long unsigned int full_dim = 1<<na; 
     basPosm.clear();
     basPosm.resize(full_dim,-99);
     long unsigned int dimm;
     basism.clear();
     basism.resize(0);
+
 
     /* If the region is less than or equal to half  |
        |  of the total number of sites (we have a full |
