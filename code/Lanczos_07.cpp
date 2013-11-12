@@ -4,7 +4,7 @@
 LANCZOS::LANCZOS(const long unsigned int Dim_, const double J_, const double Jperp_, const unsigned int Nsite_ ) : Dim (Dim_), J (J_), Jperp (Jperp_), Nsite (Nsite_)
 {
   STARTIT = 5; //I always make sure to start with at least 5 iterations (but see line 159...)
-  CONV_PREC = 1E-10; //The precision with which we converge to
+  CONV_PREC = 1E-12; //The precision with which we converge to
 
 }//constructor
 
@@ -54,15 +54,33 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
         //create a "random" starting vector 
         V0.assign(Dim, 0.0);
         //V0[ 0 ] = 1.0;
-        if( V0.size() == 4) V0[1] = 1.0;
+//        if( V0.size() == 4) V0[1] = 1.0;
         for (unsigned long int vi=0; vi < V0.size(); vi++) 
-        { 
-            //V0[vi] = 1.0;
-            if (vi == V0.size() - 1 && V0.size() != 4) V0[vi] = 1.0;
-            else if (vi%5 == 0) V0[vi] = -2.0;
-            else if (vi%7 == 0) V0[vi] = 3.0;
-            //else if (vi%9 == 0) V0[vi] = -4.0;
+        {
+            V0[vi] = 0;
         }
+        V0[0] = 2.0;
+        V0[V0.size()-1] = -2.0;
+        V0[V0.size()/2] = 1.0;
+        V0[V0.size()/2+1] = 1.0;
+ //       for (unsigned long int vi=0; vi < V0.size(); vi++) 
+ //       {
+ //           int init = SparseH.Basis[vi];
+ //           int temp = (1<<4)-1;
+ //           int final = ((init & temp)<<4) +  ((init & (temp<<4))>>4); 
+ //       
+ //           if (init == final) { V0[vi] = 0;}
+ //           else{            V0[SparseH.BasPos[final]] = -1.*V0[vi]; }
+ //       
+ //      }
+ //      int summm = 0;
+ //       for (unsigned long int vi=0; vi < V0.size(); vi++) 
+ //       {
+ //          
+ //        summm+= V0[vi] ;
+
+ //       }
+ //       cout << "sum = " << summm << endl;
         //if(V0.size()>4){V0[V0.size()-1]=1.0;}
         Normalize(V0);  
    
@@ -508,3 +526,5 @@ void LANCZOS::tred3(vector< vector<double> > & a, vector<double> & d, vector<dou
   // this line has to be commented!!
   //for (i=0;i<n;i++) for (j=i+1;j<n;j++) a(i,j)=a(j,i);
 }
+
+

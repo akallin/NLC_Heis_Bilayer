@@ -1,12 +1,17 @@
 //function to calculate the RDM and entropies for a 1d 
 #ifndef entropy_H
 #define entropy_H
+#include<time.h>
 
 void getEE( vector <double>& alpha1, vector <double>& CornLineEnts, vector< vector<double> >& SuperMat );
 long unsigned int regionDim_NA_N( unsigned int na, unsigned int n, vector<unsigned long int> &Abasis, vector<unsigned long int> &AbasPos );
 
+const std::string currentDateTime();
+
 inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< pair<double,double> >& ents, 
         vector< vector< int > >& RScoords, vector <long unsigned int> Basis){
+
+
 
     // Get the graph dimensions from the realspace coordinates
     int xMax = RScoords.size();
@@ -49,7 +54,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     xSize = xMax;
     // Iterate over the horizontal cuts
     for(int ySize=1; ySize<=yMax/2; ySize++){
-        cout << "Line term H" << ySize;
+        cout << currentDateTime() << " Line term H" << ySize;
 
         // Get the dimensions of region A and B;
         // states don't necessarily have Sz=0 in their regions 
@@ -61,14 +66,14 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
         //cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
 
         // Initialize the matrix of eigenvalues
-        cout << "Initialize Supermat" << endl;
+        cout << currentDateTime() << " Initialize Supermat" << endl;
         SuperMat.clear();
         SuperMat.resize(Adim);
         for(long unsigned int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
-        cout << ".... Supermat created" << endl;
+        cout << currentDateTime() << " .... Supermat created" << endl;
 
         // Loop over all the basis states
-        cout << "Looping over basis states" << endl;
+        cout << currentDateTime() << " Looping over basis states" << endl;
 
         for(long unsigned int i=0; i<Dim; i++){      
             // extractifying the region A and region B states
@@ -147,7 +152,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
 
             SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
         }
-        cout << "   ... Supermat filled" << endl;
+        cout << currentDateTime() <<"   ... Supermat filled" << endl;
 
         // ------ GET ENTROPY!!! ------
         getEE(alpha1, tempEnt, SuperMat);
@@ -164,7 +169,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     // Iterate over the vectical cuts
     for(int xSize=1; xSize<=xMax/2; xSize++){
 
-        cout << "Line term V" << xSize << endl;
+        cout << currentDateTime() << " Line term V" << xSize << endl;
 
         // Get the dimensions of region A and B;
         Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
@@ -269,7 +274,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     for(int ySize=1; ySize<yMax; ySize++){
         for(int xSize=1; xSize<xMax; xSize++){
             
-            cout << "Corner term " << ySize*xSize << endl;
+            cout << currentDateTime() << " Corner term " << ySize*xSize << endl;
 
             // Get the dimensions of region A and B;
             Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
@@ -432,17 +437,17 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
     long int Dim(0);
     long int Dim_sq;
 
-    cout << "Getting EE" << endl;
+    cout << currentDateTime() << " Getting EE" << endl;
     // Using SuperMat to get the density matrix
     // If Adim > Bdim TRANSPOSE!!
     if(SuperMat.size()>=SuperMat[0].size()){
         Dim = SuperMat[0].size();
-        cout << "Dim = " << Dim << "  Dim*Dim = " << Dim*Dim << endl;
+        cout << currentDateTime() << " Dim = " << Dim << "  Dim*Dim = " << Dim*Dim << endl;
         //DM.resize(Dim,Dim);
-        cout << "creating DM ... " << endl;
+        cout << currentDateTime() << " creating DM ... " << endl;
         Dim_sq = Dim*Dim;
         DM= new double[Dim_sq];  //This is a c-style array
-        cout << "DM created " << endl;
+        cout << currentDateTime() << " DM created " << endl;
 
         for(long int i=0; i<Dim; i++){
             for(long int j=i; j<Dim; j++){
@@ -453,18 +458,18 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
                 DM[j*Dim + i] = temp; 
                 DM[i*Dim + j] = temp; //matrix is symmetric
             }
-            if(i%265==0){cout<<"i = " << i << endl;}
+            if(i%265==0){cout<<currentDateTime() <<" i = " << i << endl;}
         }
-        cout << "DM filled" << endl;
+        cout << currentDateTime() << " DM filled" << endl;
     }
     // Otherwise, use Adim
     else{
         Dim = SuperMat.size();
         //DM.resize(Dim,Dim);
-        cout << "creating DM ... " << endl;
+        cout << currentDateTime() << " creating DM ... " << endl;
         Dim_sq = Dim*Dim;
         DM= new double[Dim_sq];  //This is a c-style array
-        cout << "DM created" << endl;
+        cout << currentDateTime() << " DM created" << endl;
 
         for(long int i=0; i<Dim; i++){
             for(long int j=i; j<Dim; j++){
@@ -475,9 +480,9 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
                 DM[j*Dim + i] = temp;            
                 DM[i*Dim + j] = temp; //matrix is symmetric
             }
-            if(i%265==0){cout<<"i = " << i << endl;}
+            if(i%265==0){cout<<currentDateTime()<< " i = " << i << endl;}
         }
-        cout << "DM filled" << endl;
+        cout << currentDateTime() << " DM filled" << endl;
     }
 
     // Eigenvalues of the RDM get put in dd
@@ -485,10 +490,10 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
 
     //Diagonalizing the RDM
     while(dd.size()>0){dd.erase(dd.begin());}
-    cout << "Beginning diagonalization" << endl;
+    cout << currentDateTime() << " Beginning diagonalization" << endl;
     int drim = Dim;
     diagWithLapack_R(DM,dd,drim,drim);
-    cout << "Diagonalization complete " << endl;
+    cout << currentDateTime() << " Diagonalization complete " << endl;
 
     //clean up DM, unless you need it anywhere below
     delete [] DM;
@@ -497,7 +502,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
     double vN(0), renyi(0); 
     temp=0;
 
-    cout << "calculating renyis " << endl;
+    cout << currentDateTime() << " calculating renyis " << endl;
     for(int a=0; a<alpha2.size(); a++){
         EE=0;
         vN=0;
@@ -525,7 +530,20 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vec
 
         CornLineEnts[a] = EE;
     }
-    cout << "EE complete" << endl;
+    cout << currentDateTime() << " EE complete" << endl;
 }//End of getEE
+
+
+const std::string currentDateTime() {
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%Y-%m-%d[%X]", &tstruct);
+
+    return buf;
+}
 
 #endif

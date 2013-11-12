@@ -26,9 +26,11 @@ using namespace std;
 #include "graphs.h"
 #include "entropy.h"
 
+unsigned long int swap_layers(unsigned long int , int );
 
 int main(int argc, char** argv){
 
+    cout << currentDateTime() << " Beginning Program " << endl;
     int CurrentArg = 1;
     string InputFile = "3x3square.dat"; 
     string OutputFile = "output_2d.dat";
@@ -82,8 +84,8 @@ int main(int argc, char** argv){
     cout.precision(10);
 
     // The Jperp values to use
-    const int numJperpVals = 1;
-    double Jperpvals[numJperpVals] = {0}; // Uncoupled layers, for now
+    vector <double> Jperpvals;
+    Jperpvals.push_back(2.522);
 
     // The Renyi entropies to measure (if it's not set in commandline)
     vector <double> alphas;
@@ -101,7 +103,7 @@ int main(int argc, char** argv){
     entVec.resize(numRenyis);
 
     // Loop Over All Values of Jperp -----------------
-    for(int Jp=0; Jp<numJperpVals; Jp++){
+    for(int Jp=0; Jp<Jperpvals.size(); Jp++){
         entVec.clear();
         entVec.resize(numRenyis);
 
@@ -113,48 +115,19 @@ int main(int argc, char** argv){
 
             // Special Case for 1-site, 2-site, 3-site graphs
             // Change this for the bilayer case
-            if(fileGraphs.at(i).NumberSites<=3){
 
                 //Now this is a 2 site graph... will this work?  What if the layers are uncoupled?
                 if(fileGraphs.at(i).NumberSites==1){
                     //energy depends on Jperp
-                    energy=0;
+                    energy= -0.75*Jperp;
                     for(int a=0; a<numRenyis; a++){
                         entVec[a].first=0;
                         entVec[a].second=0;
                     }
                 }
-                // 4-site graph
-                else if(fileGraphs.at(i).NumberSites==2){
-                    energy = -0.75*J;
-                    for(int a=0; a<numRenyis; a++){
-                        if(fileGraphs.at(i).RealSpaceCoordinates[0].size()==2){
-                            entVec[a].first=log(2.0); 
-                        }
-
-                        else{ entVec[a].first=0; }
-                        entVec[a].second=0;       
-                    }
-                }
-                // 6-site graph
+            
+            // All other graphs
                 else{
-                    energy = -1.0*J;
-                    double eig1(5./6.);
-                    double eig2(1./6.);
-                    for(int a=0; a<numRenyis; a++){
-                        if(fileGraphs.at(i).RealSpaceCoordinates[0].size()==3){
-                            if(fabs(1.0-(alphas[a]))<0.000001){entVec[a].first=2.*(-eig1*log(eig1)-eig2*log(eig2));}
-                            else{entVec[a].first=(2./(1.-alphas[a]))*log(pow(eig1,alphas[a])+pow(eig2,alphas[a]));}
-                        }
-                        else{
-                            entVec[a].first=0;
-                        }
-                        entVec[a].second=0;
-                    }
-                }
-            }
-            // All the graphs w/ >3 sites per layer
-            else{
                 //---Generate the Hamiltonian---
                 GENHAM HV(fileGraphs.at(i).NumberSites,fileGraphs.at(i).AdjacencyList); 
 
@@ -162,23 +135,35 @@ int main(int argc, char** argv){
                 LANCZOS lancz(HV.Vdim,J,Jperp,fileGraphs.at(i).NumberSites);  //dimension of Hilbert space 
                 //HV.SparseHamJQ();  //generates sparse matrix Hamiltonian for Lanczos
 
+                cout << currentDateTime() << " Starting Lanczos " << endl;
+
                 //---------- Diagonalize and get Eigenvector -------
                 energy = lancz.Diag(HV, 1, prm.valvec_, eVec); // Hamiltonian, # of eigenvalues to converge, 1 for -values only, 2 for vals AND vectors
-                cout << "energy = " << energy << "  eVec size = " << eVec.size() << endl;
+
+                /* //examine the symmetry of the eigenvector    
+                   long unsigned int vi; 
+                   for(int v = 0; v<eVec.size(); v++){
+                   cout << v << " " << HV.BasPos[swap_layers(HV.Basis[v],fileGraphs.at(i).NumberSites)] <<  " " << eVec[v] << "    " << 
+                   eVec[v] + eVec[HV.BasPos[swap_layers(HV.Basis[v],fileGraphs.at(i).NumberSites)]]<< " "  
+                   << eVec[v] - eVec[HV.BasPos[swap_layers(HV.Basis[v],fileGraphs.at(i).NumberSites)]] << endl;
+                   }
+                 */
+
+                cout << currentDateTime() << " energy = " << energy << "  eVec size = " << eVec.size() << endl;
                 HV.BasPos.resize(0);
                 Entropy2D(alphas, eVec, entVec, fileGraphs.at(i).RealSpaceCoordinates, HV.Basis);
-            }
-            //---------- Push Back the results --------
-            WeightEnergy=energy;
-            //Loop Here!!!  ALSO MAKE NOTE THAT LINE IS FIRST AND CORNER IS SECOND !_!_!_!_!_!_!_!_!_!_!_!_!_!
-            for(int a=0; a<numRenyis; a++){
-                WeightLineEntropy[a] = entVec[a].first;
-                WeightCornerEntropy[a] = entVec[a].second;
-            }
+                }
+                //---------- Push Back the results --------
+                WeightEnergy=energy;
+                //Loop Here!!!  ALSO MAKE NOTE THAT LINE IS FIRST AND CORNER IS SECOND !_!_!_!_!_!_!_!_!_!_!_!_!_!
+                for(int a=0; a<numRenyis; a++){
+                    WeightLineEntropy[a] = entVec[a].first;
+                    WeightCornerEntropy[a] = entVec[a].second;
+                }
 
 
 
-            //Output the Data!!   
+                //Output the Data!!   
 
             cout <<"Graph " << setw(3) << fileGraphs.at(i).Identifier <<  " Sites " <<setw(2)<< fileGraphs.at(i).NumberSites 
                 << "  Jp= " << setw(6) << Jperp << "   E=" <<setw(16)<< WeightEnergy << " Line";
@@ -203,4 +188,16 @@ int main(int argc, char** argv){
 
     // fout.close();
     return 0;
+}
+
+unsigned long int swap_layers(unsigned long int init, int N){
+
+    unsigned long int final;
+    unsigned long int temp;
+    
+    temp = (1<<N)-1;
+
+    final = ((init & temp)<<N) +  ((init & (temp<<N))>>N); 
+
+    return final;
 }

@@ -62,6 +62,7 @@ int main(int argc, char** argv){
   // Read Measurement Data in from File
   //-------------------------------
 
+  vector<int> GraphMap; // if they're not in the right order this tells you the order.
   vector<int> Identifier;
   vector<int> Nsites;
   vector<double> Jperp;
@@ -116,45 +117,49 @@ int main(int argc, char** argv){
     // Read in everything!
 
     for  (unsigned int currentLine = 0; currentLine < numLines; currentLine++)
-      {
-	
-	ss << rawLines.at(currentLine);
-	
-	//------ Read in the first line of the graph ------//
-	ss >> tempstring;
+    {
+
+        ss << rawLines.at(currentLine);
+
+        //------ Read in the first line of the graph ------//
+        ss >> tempstring;
         ss >> Identifier[currentLine];
-	ss >> tempstring;
+        // Make GraphMap
+        if(Identifier[currentLine]>=GraphMap.size()){ GraphMap.resize(Identifier[currentLine]+1);}
+        GraphMap[Identifier[currentLine]] = currentLine;
+
+        //Continue Reading everything in
+        ss >> tempstring;
         ss >> Nsites[currentLine];
-	ss >> tempstring;
-	ss >> Jperp[currentLine];
-	ss >> tempstring;
+        ss >> tempstring;
+        ss >> Jperp[currentLine];
+        ss >> tempstring;
         ss >> Energy[currentLine];
 
-	RenyiLine[currentLine].resize(Alphas);
-	RenyiCorner[currentLine].resize(Alphas);
+        RenyiLine[currentLine].resize(Alphas);
+        RenyiCorner[currentLine].resize(Alphas);
 
-	ss >> tempstring;
-	for(int i=0; i<Alphas; i++){
-	  ss >> RenyiLine[currentLine][i].first;
-	  ss >> RenyiLine[currentLine][i].second;	  
-	}
-	ss >> tempstring;
-	for(int i=0; i<Alphas; i++){
-	  ss >> RenyiCorner[currentLine][i].first;
-	  ss >> RenyiCorner[currentLine][i].second;	  
-	}
-	
+        ss >> tempstring;
+        for(int i=0; i<Alphas; i++){
+            ss >> RenyiLine[currentLine][i].first;
+            ss >> RenyiLine[currentLine][i].second;	  
+        }
+        ss >> tempstring;
+        for(int i=0; i<Alphas; i++){
+            ss >> RenyiCorner[currentLine][i].first;
+            ss >> RenyiCorner[currentLine][i].second;	  
+        }
 
         ss.str("");
         ss.clear();
-         
+
     }   
 
     // print out results
     /*
-    for(int i=0; i<numLines; i++){
-      cout << "Identifier " << Identifier[i] << ", # sites " << Nsites[i] << ", Jperp " << Jperp[i] 
-	   << ", Energy " << Energy[i] << " Line ents ";
+       for(int i=0; i<numLines; i++){
+       cout << "Identifier " << Identifier[i] << ", # sites " << Nsites[i] << ", Jperp " << Jperp[i] 
+       << ", Energy " << Energy[i] << " Line ents ";
       for(int j=0; j<Alphas; j++){ cout << RenyiLine[i][j].first << " " << RenyiLine[i][j].second <<", ";}
       cout << "Corner ents ";
       for(int j=0; j<Alphas; j++){ cout << RenyiCorner[i][j].first << " " << RenyiCorner[i][j].second <<", ";}
@@ -174,18 +179,20 @@ int main(int argc, char** argv){
     WEnergy = Energy;
     WLine = RenyiLine;
     WCorner = RenyiCorner;
+    int subGraph;
 
     //------------ Loop through the graphs and subgraphs
     for (int graph=0; graph<numLines; graph++){
-      
-      for (int sub = 0; sub < fileGraphs.at(graph).SubgraphList.size(); sub++){
-	WEnergy[graph] -= fileGraphs.at(graph).SubgraphList[sub].second * WEnergy[fileGraphs.at(graph).SubgraphList[sub].first];
-	
-	for(int a=0; a<Alphas; a++){
-	    WLine[graph][a].second -= fileGraphs.at(graph).SubgraphList[sub].second * WLine[fileGraphs.at(graph).SubgraphList[sub].first][a].second;
-	    WCorner[graph][a].second -= fileGraphs.at(graph).SubgraphList[sub].second * WCorner[fileGraphs.at(graph).SubgraphList[sub].first][a].second;
-	}	  
-      }      
+        
+        for (int sub = 0; sub < fileGraphs.at(graph).SubgraphList.size(); sub++){
+            WEnergy[graph] -= fileGraphs.at(graph).SubgraphList[sub].second * WEnergy[GraphMap[fileGraphs.at(graph).SubgraphList[sub].first]];
+
+            for(int a=0; a<Alphas; a++){
+                WLine[graph][a].second -= fileGraphs.at(graph).SubgraphList[sub].second * WLine[GraphMap[fileGraphs.at(graph).SubgraphList[sub].first]][a].second;
+                WCorner[graph][a].second -= fileGraphs.at(graph).SubgraphList[sub].second * 
+                    WCorner[GraphMap[fileGraphs.at(graph).SubgraphList[sub].first]][a].second;
+            }	  
+        }      
     }
     
   //----------------------------------------------------------
@@ -198,30 +205,30 @@ int main(int argc, char** argv){
     int maxOrder(0);
     for(int i=0; i<numLines; i++){ if(Nsites[i]>maxOrder){maxOrder=Nsites[i];} }
     maxSize = maxOrder-1;
-    
+
     vector<double> NLCEnergy;
     vector< vector< pair<double, double> > > NLCLine, NLCCorner;
-      
+
     NLCEnergy.resize(maxSize);
     NLCLine.resize(maxSize);
     NLCCorner.resize(maxSize);
 
     int entry;
     for (int order=2; order<=maxOrder; order++){
-      entry = order-2;
-      NLCLine[entry].resize(Alphas);
-      NLCCorner[entry].resize(Alphas);
+        entry = order-2;
+        NLCLine[entry].resize(Alphas);
+        NLCCorner[entry].resize(Alphas);
 
-      // change this part to not start at graph 0 //
-      for(int graph=0; graph<Energy.size(); graph++){
-	if(Nsites[graph]<=order){ 
-	  NLCEnergy[entry] += WEnergy[graph]*fileGraphs.at(graph).LatticeConstant;
-	  for(int a=0; a<Alphas; a++){
-	    NLCLine[entry][a].second += WLine[graph][a].second * fileGraphs.at(graph).LatticeConstant;
-	    NLCCorner[entry][a].second += WCorner[graph][a].second * fileGraphs.at(graph).LatticeConstant;
-	  }
-	}
-      }
+        // change this part to not start at graph 0 //
+        for(int graph=0; graph<Energy.size(); graph++){
+            if(Nsites[graph]<=order){ 
+                NLCEnergy[entry] += WEnergy[graph]*fileGraphs.at(graph).LatticeConstant;
+                for(int a=0; a<Alphas; a++){
+                    NLCLine[entry][a].second += WLine[graph][a].second * fileGraphs.at(graph).LatticeConstant;
+                    NLCCorner[entry][a].second += WCorner[graph][a].second * fileGraphs.at(graph).LatticeConstant;
+                }
+            }
+        }
     }
       
   //----------------------------------------------------------
