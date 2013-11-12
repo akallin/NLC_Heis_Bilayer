@@ -58,6 +58,9 @@ double LANCZOS::Diag(const GENHAM& SparseH, const int Neigen, const int Evects2,
         for (unsigned long int vi=0; vi < V0.size(); vi++) 
         {
             V0[vi] = 0;
+            if(vi%5==0){V0[vi]=1;}
+            else if(vi%6==0){V0[vi]=2;}
+            else if(vi%7==0){V0[vi]=-3;}
         }
         V0[0] = 2.0;
         V0[V0.size()-1] = -2.0;
