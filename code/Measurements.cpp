@@ -90,7 +90,7 @@ int main(int argc, char** argv){
     // The Renyi entropies to measure (if it's not set in commandline)
     vector <double> alphas;
     if(alpha==0){
-        for(double a1=1; a1<3.03; a1+=1){
+        for(double a1=0.05; a1<5.05; a1+=0.025){
             alphas.push_back(a1);
         }
     }
@@ -166,14 +166,14 @@ int main(int argc, char** argv){
                 //Output the Data!!   
 
             cout <<"Graph " << setw(3) << fileGraphs.at(i).Identifier <<  " Sites " <<setw(2)<< fileGraphs.at(i).NumberSites 
-                << "  Jp= " << setw(6) << Jperp << "   E=" <<setw(16)<< WeightEnergy << " Line";
+                << "  Jp= " << setw(6) << Jperp << "   E=" <<setw(20)<< WeightEnergy << " Line";
 
             for(int a=0; a<alphas.size(); a++){ 
-                cout  << setw(4) <<  alphas[a] << setw(16) << WeightLineEntropy[a] ;
+                cout  << setw(6) <<  alphas[a] << setw(20) << WeightLineEntropy[a] ;
             }
             cout << " Corner";
             for(int a=0; a<alphas.size(); a++){ 
-                cout  <<setw (4) << alphas[a] << setw(16) << WeightCornerEntropy[a];
+                cout  <<setw (6) << alphas[a] << setw(20) << WeightCornerEntropy[a];
             }
             cout << endl;
 
