@@ -177,9 +177,11 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
         //cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
 
         // Initialize the matrix of eigenvalues
+        cout << currentDateTime() << " Initialize Supermat" << endl;
         SuperMat.clear();
         SuperMat.resize(Adim);
         for(long unsigned int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
+        cout << currentDateTime() << " .... Supermat created" << endl;
 
         // Loop over all the basis states
         for(long unsigned int i=0; i<Dim; i++){      
@@ -260,6 +262,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
             if(AbasPos[aState]<0 || BbasPos[bState]<0){ cout << "SUPER ERROR!" << endl; exit(1);}
             SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
         }
+        cout << currentDateTime() <<"   ... Supermat filled" << endl;
 
         // ------ GET ENTROPY!!! ------
         getEE(alpha1, tempEnt, SuperMat);
@@ -281,9 +284,11 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
             Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
 
             // Initialize the matrix of eigenvalues
+            cout << currentDateTime() << " Initialize Supermat" << endl;
             SuperMat.clear();
             SuperMat.resize(Adim);
             for(long unsigned int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
+            cout << currentDateTime() << " .... Supermat created" << endl;
 
             // Loop over all the basis states
             for(long unsigned int i=0; i<Dim; i++){      
@@ -363,7 +368,8 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
                 if(AbasPos[aState]<0 || BbasPos[bState]<0){ cout << "SUPER ERROR! " << endl; exit(1);}
                 SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
             }
-
+            
+            cout << currentDateTime() <<"   ... Supermat filled" << endl;
             // ------ GET ENTROPY!!! ------
             getEE(alpha1, tempEnt, SuperMat);
             for(int a=0; a<alpha1.size(); a++){
