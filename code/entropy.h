@@ -12,7 +12,6 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
         vector< vector< int > >& RScoords, vector <long unsigned int> Basis){
 
 
-
     // Get the graph dimensions from the realspace coordinates
     int xMax = RScoords.size();
     int yMax = RScoords[0].size();

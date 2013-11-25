@@ -5,7 +5,7 @@ using namespace std;
 
 int main(){
 
-    unsigned maxOrder(16);
+    unsigned maxOrder(10);
     unsigned ID(0);
     bool corner(false);
     //bool corner(true);
@@ -27,8 +27,8 @@ int main(){
                 idList.push_back(make_pair(x,y));       
 
                 // ---------- Site coordinates (x,y) pairs 
-                for(unsigned x1=0; x1<x; x1++){
-                    for(unsigned y1=0; y1<y; y1++){
+                for(unsigned y1=0; y1<y; y1++){
+                    for(unsigned x1=0; x1<x; x1++){
                         cout << x1 << " " << y1 << " ";
                     }
                 }
