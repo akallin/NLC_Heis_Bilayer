@@ -165,109 +165,121 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
 
     // -*-*-*-*-*-*-*- Vertical -*-*-*-*-*-*-*-*-
     ySize = yMax;
-    // Iterate over the vectical cuts
-    for(int xSize=1; xSize<=xMax/2; xSize++){
-
-        cout << currentDateTime() << " Line term V" << xSize << endl;
-
-        // Get the dimensions of region A and B;
-        Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
-        Bdim = regionDim_NA_N(Nsite - xSize*ySize, Nsite, Bbasis, BbasPos);
-        //cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
-
-        // Initialize the matrix of eigenvalues
-        cout << currentDateTime() << " Initialize Supermat" << endl;
-        SuperMat.clear();
-        SuperMat.resize(Adim);
-        for(long unsigned int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
-        cout << currentDateTime() << " .... Supermat created" << endl;
-
-        // Loop over all the basis states
-        for(long unsigned int i=0; i<Dim; i++){      
-            // extractifying the region A and region B states
-            tempState = Basis[i];
-
-            // Loop over region A
-            aState=0; // Initialize the state in region A
-            for(int y=0; y<yMax; y++){
-                for(int x=0; x<xSize; x++){
-
-                    // Layer 1 --------------------------------------
-                    // Figure out the spin number given the x,y coords
-                    tempSpin = RScoords[x][y];
-
-                    // Extract the state of tempSpin
-                    spinState = ((tempState&(1<<tempSpin))>>tempSpin);
-
-                    // Add the spin state to region A
-                    aState += spinState;
-
-                    // Shift the bits by 1 (for the next site)
-                    aState = aState<<1;
-
-                    // Layer 2 --------------------------------------
-                    // Figure out the spin number given the x,y coords
-                    tempSpin += Nsite;
-
-                    // Extract the state of tempSpin
-                    spinState = ((tempState&(1<<tempSpin))>>tempSpin);
-
-                    // Add the spin state to region A
-                    aState += spinState;
-
-                    // Shift the bits by 1 (for the next site)
-                    aState = aState<<1;
-
-                }
-            }
-            // Unshift aState by 1 (because there was one extra)
-            aState = aState>>1;
-
-            // Loop over region B (note x starts at xSize)
-            bState=0; // Initialize the state in region B
-            for(int y=0; y<yMax; y++){
-                for(int x=xSize; x<xMax; x++){
-
-                    // Layer 1 --------------------------------------
-                    // Figure out the spin number given the x,y coords
-                    tempSpin = RScoords[x][y];
-
-                    // Extract the state of tempSpin
-                    spinState = ((tempState&(1<<tempSpin))>>tempSpin);
-
-                    // Add the spin state to region B
-                    bState += spinState;
-
-                    // Shift the bits by 1 (for the next site)
-                    bState = bState<<1;
-
-                    // Layer 2 --------------------------------------
-                    // Figure out the spin number given the x,y coords
-                    tempSpin += Nsite;
-
-                    // Extract the state of tempSpin
-                    spinState = ((tempState&(1<<tempSpin))>>tempSpin);
-
-                    // Add the spin state to region B
-                    bState += spinState;
-
-                    // Shift the bits by 1 (for the next site)
-                    bState = bState<<1;
-                }
-            }	
-            // Unshift bState by 1 (because there was one extra)
-            bState = bState>>1;
-
-            if(AbasPos[aState]<0 || BbasPos[bState]<0){ cout << "SUPER ERROR!" << endl; exit(1);}
-            SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
-        }
-        cout << currentDateTime() <<"   ... Supermat filled" << endl;
-
-        // ------ GET ENTROPY!!! ------
-        getEE(alpha1, tempEnt, SuperMat);
+    
+    //if it's a square no need to do the same measurements twice
+    if(xMax == yMax){
         for(int a=0; a<alpha1.size(); a++){
-            ents[a].second += -(yMax-1)*tempEnt[a];
-            if(xSize<(xMax+1)/2){ ents[a].second += -(yMax-1)*tempEnt[a]; }
+            ents[a].first *=2;
+            ents[a].second *=2; 
+        }
+    }
+    else{
+        // Iterate over the vectical cuts
+        for(int xSize=1; xSize<=xMax/2; xSize++){
+
+            cout << currentDateTime() << " Line term V" << xSize << endl;
+
+            // Get the dimensions of region A and B;
+            Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
+            Bdim = regionDim_NA_N(Nsite - xSize*ySize, Nsite, Bbasis, BbasPos);
+            //cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
+
+            // Initialize the matrix of eigenvalues
+            cout << currentDateTime() << " Initialize Supermat" << endl;
+            SuperMat.clear();
+            SuperMat.resize(Adim);
+            for(long unsigned int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
+            cout << currentDateTime() << " .... Supermat created" << endl;
+
+            // Loop over all the basis states
+            for(long unsigned int i=0; i<Dim; i++){      
+                // extractifying the region A and region B states
+                tempState = Basis[i];
+
+                // Loop over region A
+                aState=0; // Initialize the state in region A
+                for(int y=0; y<yMax; y++){
+                    for(int x=0; x<xSize; x++){
+
+                        // Layer 1 --------------------------------------
+                        // Figure out the spin number given the x,y coords
+                        tempSpin = RScoords[x][y];
+
+                        // Extract the state of tempSpin
+                        spinState = ((tempState&(1<<tempSpin))>>tempSpin);
+
+                        // Add the spin state to region A
+                        aState += spinState;
+
+                        // Shift the bits by 1 (for the next site)
+                        aState = aState<<1;
+
+                        // Layer 2 --------------------------------------
+                        // Figure out the spin number given the x,y coords
+                        tempSpin += Nsite;
+
+                        // Extract the state of tempSpin
+                        spinState = ((tempState&(1<<tempSpin))>>tempSpin);
+
+                        // Add the spin state to region A
+                        aState += spinState;
+
+                        // Shift the bits by 1 (for the next site)
+                        aState = aState<<1;
+
+                    }
+                }
+                // Unshift aState by 1 (because there was one extra)
+                aState = aState>>1;
+
+                // Loop over region B (note x starts at xSize)
+                bState=0; // Initialize the state in region B
+                for(int y=0; y<yMax; y++){
+                    for(int x=xSize; x<xMax; x++){
+
+                        // Layer 1 --------------------------------------
+                        // Figure out the spin number given the x,y coords
+                        tempSpin = RScoords[x][y];
+
+                        // Extract the state of tempSpin
+                        spinState = ((tempState&(1<<tempSpin))>>tempSpin);
+
+                        // Add the spin state to region B
+                        bState += spinState;
+
+                        // Shift the bits by 1 (for the next site)
+                        bState = bState<<1;
+
+                        // Layer 2 --------------------------------------
+                        // Figure out the spin number given the x,y coords
+                        tempSpin += Nsite;
+
+                        // Extract the state of tempSpin
+                        spinState = ((tempState&(1<<tempSpin))>>tempSpin);
+
+                        // Add the spin state to region B
+                        bState += spinState;
+
+                        // Shift the bits by 1 (for the next site)
+                        bState = bState<<1;
+                    }
+                }	
+                // Unshift bState by 1 (because there was one extra)
+                bState = bState>>1;
+
+                if(AbasPos[aState]<0 || BbasPos[bState]<0){ cout << "SUPER ERROR!" << endl; exit(1);}
+                SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
+            }
+            cout << currentDateTime() <<"   ... Supermat filled" << endl;
+
+            // ------ GET ENTROPY!!! ------
+            getEE(alpha1, tempEnt, SuperMat);
+            for(int a=0; a<alpha1.size(); a++){
+
+                ents[a].first += tempEnt[a];
+                ents[a].second += -(yMax-1)*tempEnt[a];
+                if(xSize<(xMax+1)/2){ents[a].first += tempEnt[a]; ents[a].second += -(yMax-1)*tempEnt[a]; }
+            }
         }
     }
 
@@ -275,7 +287,8 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     // Iterate over the corner cuts
     for(int ySize=1; ySize<yMax; ySize++){
         for(int xSize=1; xSize<xMax; xSize++){
-            
+           
+            if(xMax==yMax){if(xSize<ySize){continue;}} 
             cout << currentDateTime() << " Corner term " << ySize*xSize << endl;
 
             // Get the dimensions of region A and B;
@@ -373,6 +386,7 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
             getEE(alpha1, tempEnt, SuperMat);
             for(int a=0; a<alpha1.size(); a++){
                 ents[a].second += 2.*tempEnt[a];
+                if(xMax==yMax && xSize!=ySize){ents[a].second += 2.*tempEnt[a];}
             }//loop over alphas
         }//loop over xSize
     }//loop over ySize
