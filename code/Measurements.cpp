@@ -78,6 +78,7 @@ int main(int argc, char** argv){
 
     // Self explanatory (good naming convention, Katie)
     ReadGraphsFromFile(fileGraphs, InputFile);
+    cout << "graph file is: " << InputFile << endl;
 
     //ofstream fout(OutputFile.c_str());
     //fout.precision(10);
