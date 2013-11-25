@@ -243,17 +243,17 @@ int main(int argc, char** argv){
     cout << endl;
 
     for(int o=2; o<=maxOrder; o++){
-      cout <<"Order " <<setw(3)<< o << " Jp " << setw(5) << Jperp[1] << " Energy " << setw(15) << NLCEnergy[o-2]
+      cout <<"Order " <<setw(3)<< o << " Jp " << setw(5) << Jperp[1] << " Energy " << setw(17) << NLCEnergy[o-2]
 	   <<" LineEntropies ";
 
       for(int a=0; a<Alphas; a++){
-	cout << setw (5) << RenyiLine[o-2][a].first << setw(15) <<  NLCLine[o-2][a].second ;
+	cout << setw (5) << RenyiLine[o-2][a].first << setw(17) <<  NLCLine[o-2][a].second ;
       }
       
       cout << " CornerEntropies ";
 	
       for(int a=0; a<Alphas; a++){
-	cout << setw (5) << RenyiCorner[o-2][a].first << setw(15) <<  NLCCorner[o-2][a].second ;
+	cout << setw (5) << RenyiCorner[o-2][a].first << setw(17) <<  NLCCorner[o-2][a].second ;
       }
       cout << endl;
     }
