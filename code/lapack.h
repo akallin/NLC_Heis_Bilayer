@@ -30,12 +30,25 @@ extern "C" {
 
     int dsyev_(char *jobz, char *uplo, int *n, double *a,
 	    int *lda, double *w, double *work, int *lwork, int *info);
-}
+
+    int dgesvd_(char *jobu, char *jobvt, int *m, int *n, double *a, 
+        int *lda, double *s, double *u, int *ldu,
+        double *vt, int *ldvt, double *work, int *lwork, 
+	    int *info);
+
+    int dgesdd_(char *jobz, int *m, int *n, double *a,
+        int *lda, double *s, double *u, int *ldu, 
+	    double *vt, int *ldvt, double *work, int *lwork, 
+	    int *iwork, int *info);
+
+  }
 /*****************************************************************************/
 ///
 /// Function to take a real my_Matrix  and diag it with lapack
 ///
 //void diagWithLapack_R(Array<double, 2>& DMpart, vector<double>& EigenVals);
 void diagWithLapack_R(double *a,  vector<double>& EigenVals, int &rows_, int &cols_);
+void svdWithLapack_simple(double *a,  vector<double>& EigenVals, int &rows_, int &cols_);
+void svdWithLapack_divide();
 
 #endif

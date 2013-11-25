@@ -85,3 +85,63 @@ void diagWithLapack_R(double *a, vector<double>& EigenVals, int &rows_, int &col
       
       //cout<<"Info "<<info<<endl;
 };
+/*****************************************************************************/
+///
+/// Function to take a real my_Matrix  and diag it with lapack
+///
+
+void svdWithLapack_simple(double *a, vector<double>& EigenVals, int &rows_, int &cols_)
+{
+      char jobu='N';
+      char jobvt='N';
+      int m=rows_;
+      int n=cols_;
+      int lda=rows_;
+      int info;
+
+
+      int elems=rows_*cols_;
+      
+      // Prepare to do a workspace query 
+      int lwork=-1;
+      int lwork_=1;
+      double *work_query= new double [lwork_];
+      
+       // the singular values ( of length min(m, n) )
+      double s[n];// or is it m?????  check below too
+      double u[2]; int ldu=0;
+      double vt[2]; int ldvt=0;
+   
+      // Workspace query
+      int info_ = dgesvd_(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu,
+          vt, &ldvt, work_query, &lwork, &info);
+
+      
+      // Get sizes of the workspace and reallocate
+      lwork_=(int)fabs((work_query[0]));
+      
+      delete[] work_query;
+      double *work= new double [lwork_];
+      
+      // Call to dgesvd_
+      info_ = dgesvd_(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu,
+              vt, &ldvt, work, &lwork_, &info);
+
+      // Free all
+      delete[] work;
+      
+      // Output 
+      // is the length n or m???????
+      for(int i=0; i<n; i++) EigenVals.push_back(s[i]*s[i]);
+
+};
+/*****************************************************************************/
+///
+/// Function to take a real my_Matrix  and diag it with lapack
+///
+
+void svdWithLapack_divide()
+{
+
+};
+
