@@ -49,6 +49,6 @@ extern "C" {
 //void diagWithLapack_R(Array<double, 2>& DMpart, vector<double>& EigenVals);
 void diagWithLapack_R(double *a,  vector<double>& EigenVals, int &rows_, int &cols_);
 void svdWithLapack_simple(double *a,  vector<double>& EigenVals, int &rows_, int &cols_);
-void svdWithLapack_divide();
+void svdWithLapack_divide(double *a,  vector<double>& EigenVals, int &rows_, int &cols_);
 
 #endif

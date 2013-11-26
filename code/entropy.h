@@ -3,7 +3,7 @@
 #define entropy_H
 #include<time.h>
 
-void getEE( vector <double>& alpha1, vector <double>& CornLineEnts, vector< vector<double> >& SuperMat );
+void getEE( vector <double>& alpha1, vector <double>& CornLineEnts, double SuperMat[], long unsigned int Adim_, long unsigned int Bdim_);
 long unsigned int regionDim_NA_N( unsigned int na, unsigned int n, vector<unsigned long int> &Abasis, vector<unsigned long int> &AbasPos );
 
 const std::string currentDateTime();
@@ -26,7 +26,8 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
     vector <long unsigned int> Abasis, Bbasis, AbasPos, BbasPos;
 
     // A rectangular matrix containing the eigenvalues, used to get the RDM
-    vector< vector<double > > SuperMat;
+    double *M;// This will replace the SuperMat for the LAPACK SVD
+    
 
     // Some temp variables;
     long unsigned int tempState(-1);         // The current full basis state we're looking at
@@ -65,11 +66,13 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
         //cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
 
         // Initialize the matrix of eigenvalues
-        cout << currentDateTime() << " Initialize Supermat" << endl;
-        SuperMat.clear();
-        SuperMat.resize(Adim);
-        for(long unsigned int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
-        cout << currentDateTime() << " .... Supermat created" << endl;
+        cout << currentDateTime() << " Initialize M" << endl;
+        
+        //delete [] M;
+        M = new double[Adim*Bdim]; 
+        cout << currentDateTime() << " .... M created" << endl;
+        for(int z=0; z<Adim*Bdim; z++){ M[z] = 0;}
+        cout << currentDateTime() << " .... M initialized" << endl;
 
         // Loop over all the basis states
         cout << currentDateTime() << " Looping over basis states" << endl;
@@ -148,13 +151,15 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
             }	
             // Unshift bState by 1 (because there was one extra)
             bState = bState>>1;
-
-            SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
+           
+            // should I do this the other way, or does is matter??? like switch A/B 
+            M[AbasPos[aState]*Bdim + BbasPos[bState]] =  eigs[i];
         }
         cout << currentDateTime() <<"   ... Supermat filled" << endl;
 
         // ------ GET ENTROPY!!! ------
-        getEE(alpha1, tempEnt, SuperMat);
+        getEE(alpha1, tempEnt, M, Adim, Bdim);
+        delete [] M;
         for(int a=0; a<alpha1.size(); a++){
             ents[a].first += tempEnt[a];
             ents[a].second += -(xMax-1)*tempEnt[a];
@@ -185,11 +190,14 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
             //cout << "Adim = " << Adim << "  Bdim = " << Bdim << endl;
 
             // Initialize the matrix of eigenvalues
-            cout << currentDateTime() << " Initialize Supermat" << endl;
-            SuperMat.clear();
-            SuperMat.resize(Adim);
-            for(long unsigned int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
-            cout << currentDateTime() << " .... Supermat created" << endl;
+            cout << currentDateTime() << " Initialize M" << endl;
+
+            //delete [] M;
+            M = new double[Adim*Bdim]; 
+            cout << currentDateTime() << " .... M created" << endl;
+        for(int z=0; z<Adim*Bdim; z++){ M[z] = 0;}
+        cout << currentDateTime() << " .... M initialized" << endl;
+
 
             // Loop over all the basis states
             for(long unsigned int i=0; i<Dim; i++){      
@@ -268,14 +276,14 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
                 bState = bState>>1;
 
                 if(AbasPos[aState]<0 || BbasPos[bState]<0){ cout << "SUPER ERROR!" << endl; exit(1);}
-                SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
+                  M[AbasPos[aState]*Bdim + BbasPos[bState]] =  eigs[i];
             }
             cout << currentDateTime() <<"   ... Supermat filled" << endl;
 
             // ------ GET ENTROPY!!! ------
-            getEE(alpha1, tempEnt, SuperMat);
+            getEE(alpha1, tempEnt, M, Adim, Bdim);
+            delete [] M;
             for(int a=0; a<alpha1.size(); a++){
-
                 ents[a].first += tempEnt[a];
                 ents[a].second += -(yMax-1)*tempEnt[a];
                 if(xSize<(xMax+1)/2){ents[a].first += tempEnt[a]; ents[a].second += -(yMax-1)*tempEnt[a]; }
@@ -295,12 +303,16 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
             Adim = regionDim_NA_N(xSize*ySize, Nsite, Abasis, AbasPos);
             Bdim = regionDim_NA_N(Nsite - xSize*ySize,Nsite, Bbasis, BbasPos);
 
+
             // Initialize the matrix of eigenvalues
-            cout << currentDateTime() << " Initialize Supermat" << endl;
-            SuperMat.clear();
-            SuperMat.resize(Adim);
-            for(long unsigned int q=0; q<Adim; q++){ SuperMat[q].resize(Bdim); }
-            cout << currentDateTime() << " .... Supermat created" << endl;
+            cout << currentDateTime() << " Initialize M" << endl;
+
+            //delete [] M;
+            M = new double[Adim*Bdim]; 
+            cout << currentDateTime() << " .... M created" << endl;
+        for(int z=0; z<Adim*Bdim; z++){ M[z] = 0;}
+        cout << currentDateTime() << " .... M initialized" << endl;
+
 
             // Loop over all the basis states
             for(long unsigned int i=0; i<Dim; i++){      
@@ -378,18 +390,21 @@ inline void Entropy2D(vector <double>& alpha1, vector<l_double>& eigs, vector< p
                 bState = bState>>1;
 
                 if(AbasPos[aState]<0 || BbasPos[bState]<0){ cout << "SUPER ERROR! " << endl; exit(1);}
-                SuperMat[AbasPos[aState]][BbasPos[bState]] = eigs[i];
+                M[AbasPos[aState]*Bdim + BbasPos[bState]] =  eigs[i];
             }
-            
+
             cout << currentDateTime() <<"   ... Supermat filled" << endl;
             // ------ GET ENTROPY!!! ------
-            getEE(alpha1, tempEnt, SuperMat);
+            getEE(alpha1, tempEnt, M, Adim, Bdim);
+            delete [] M;
             for(int a=0; a<alpha1.size(); a++){
                 ents[a].second += 2.*tempEnt[a];
                 if(xMax==yMax && xSize!=ySize){ents[a].second += 2.*tempEnt[a];}
             }//loop over alphas
         }//loop over xSize
     }//loop over ySize
+
+
 }
 //End of Entropy2D
 
@@ -448,74 +463,26 @@ long unsigned int regionDim_NA_N( unsigned na1, unsigned n1, vector<long unsigne
 /* -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
    getEE
    -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*- */
-void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, vector< vector<double> >& SuperMat ){
-    // The Density Matrix
-    double *DM; //create a pointer to a c-style array
+void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, 
+        double SuperMat[], long unsigned int Adim_, long unsigned int Bdim_ ){
 
     double temp(0);
-    long int Dim(0);
-    long int Dim_sq;
 
     cout << currentDateTime() << " Getting EE" << endl;
-    // Using SuperMat to get the density matrix
-    // If Adim > Bdim TRANSPOSE!!
-    if(SuperMat.size()>=SuperMat[0].size()){
-        Dim = SuperMat[0].size();
-        cout << currentDateTime() << " Dim = " << Dim << "  Dim*Dim = " << Dim*Dim << endl;
-        //DM.resize(Dim,Dim);
-        cout << currentDateTime() << " creating DM ... " << endl;
-        Dim_sq = Dim*Dim;
-        DM= new double[Dim_sq];  //This is a c-style array
-        cout << currentDateTime() << " DM created " << endl;
-
-        for(long int i=0; i<Dim; i++){
-            for(long int j=i; j<Dim; j++){
-                temp=0;
-                for(int k=0; k<SuperMat.size(); k++){
-                    temp += SuperMat[k][i]*SuperMat[k][j];
-                }
-                DM[j*Dim + i] = temp; 
-                DM[i*Dim + j] = temp; //matrix is symmetric
-            }
-            if(i%265==0){cout<<currentDateTime() <<" i = " << i << endl;}
-        }
-        cout << currentDateTime() << " DM filled" << endl;
-    }
-    // Otherwise, use Adim
-    else{
-        Dim = SuperMat.size();
-        //DM.resize(Dim,Dim);
-        cout << currentDateTime() << " creating DM ... " << endl;
-        Dim_sq = Dim*Dim;
-        DM= new double[Dim_sq];  //This is a c-style array
-        cout << currentDateTime() << " DM created" << endl;
-
-        for(long int i=0; i<Dim; i++){
-            for(long int j=i; j<Dim; j++){
-                temp=0;
-                for(long int k=0; k<SuperMat[0].size(); k++){
-                    temp += SuperMat[i][k]*SuperMat[j][k];
-                }
-                DM[j*Dim + i] = temp;            
-                DM[i*Dim + j] = temp; //matrix is symmetric
-            }
-            if(i%265==0){cout<<currentDateTime()<< " i = " << i << endl;}
-        }
-        cout << currentDateTime() << " DM filled" << endl;
-    }
 
     // Eigenvalues of the RDM get put in dd
     vector<double> dd;
 
-    //Diagonalizing the RDM
+    //SVD
     while(dd.size()>0){dd.erase(dd.begin());}
-    cout << currentDateTime() << " Beginning diagonalization" << endl;
-    int drim = Dim;
-    diagWithLapack_R(DM,dd,drim,drim);
-    cout << currentDateTime() << " Diagonalization complete " << endl;
+    cout << currentDateTime() << " Beginning SVD" << endl;
+    int dimA = Adim_;
+    int dimB = Bdim_;
 
-    //clean up DM, unless you need it anywhere below
-    delete [] DM;
+    // If I switch the rows and columns then switch dimB/dimA
+    //svdWithLapack_simple(SuperMat,dd,dimB,dimA);
+    svdWithLapack_divide(SuperMat,dd,dimB,dimA);
+    cout << currentDateTime() << " SVD complete " << endl;
 
     double EE(0);
     double vN(0), renyi(0); 

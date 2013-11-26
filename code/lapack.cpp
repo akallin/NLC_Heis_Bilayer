@@ -98,41 +98,40 @@ void svdWithLapack_simple(double *a, vector<double>& EigenVals, int &rows_, int 
       int n=cols_;
       int lda=rows_;
       int info;
-
+      int SVs = m;
+      if(m>n){SVs = n;}
 
       int elems=rows_*cols_;
       
       // Prepare to do a workspace query 
       int lwork=-1;
-      int lwork_=1;
-      double *work_query= new double [lwork_];
-      
+      double work_query;
+
        // the singular values ( of length min(m, n) )
-      double s[n];// or is it m?????  check below too
-      double u[2]; int ldu=0;
-      double vt[2]; int ldvt=0;
+      double *s = new double [SVs];
+      double *u; int ldu=m;
+      double *vt; int ldvt=n;
    
       // Workspace query
       int info_ = dgesvd_(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu,
-          vt, &ldvt, work_query, &lwork, &info);
+          vt, &ldvt, &work_query, &lwork, &info);
 
       
       // Get sizes of the workspace and reallocate
-      lwork_=(int)fabs((work_query[0]));
-      
-      delete[] work_query;
-      double *work= new double [lwork_];
+      lwork = (int)work_query;
+      double* work = (double*)malloc( lwork*sizeof(double) );
       
       // Call to dgesvd_
       info_ = dgesvd_(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu,
-              vt, &ldvt, work, &lwork_, &info);
+              vt, &ldvt, work, &lwork, &info);
 
-      // Free all
-      delete[] work;
-      
       // Output 
       // is the length n or m???????
-      for(int i=0; i<n; i++) EigenVals.push_back(s[i]*s[i]);
+      for(int i=0; i<n; i++){ EigenVals.push_back(s[i]*s[i]);} // cout << s[i] << endl;}
+    
+      // Free all
+      free( (void*)work );
+      delete[] s;
 
 };
 /*****************************************************************************/
@@ -140,8 +139,52 @@ void svdWithLapack_simple(double *a, vector<double>& EigenVals, int &rows_, int 
 /// Function to take a real my_Matrix  and diag it with lapack
 ///
 
-void svdWithLapack_divide()
+void svdWithLapack_divide(double *a,  vector<double>& EigenVals, int &rows_, int &cols_)
 {
+      char jobu='N';
+      char jobvt='N';
+      int m=rows_;
+      int n=cols_;
+      int lda=rows_;
+      int info;
+      int SVs = m;
+      if(m>n){SVs = n;}
+      int iwork[8*n];
+      
+      int elems=rows_*cols_;
+      
+      // Prepare to do a workspace query 
+      int lwork=-1;
+      double work_query;
+
+       // the singular values ( of length min(m, n) )
+      double *s = new double [SVs];
+      double *u; int ldu=m;
+      double *vt; int ldvt=n;
+   
+      // Workspace query
+     dgesdd_("N", &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, &work_query, &lwork, iwork, &info);
+      
+      // Get sizes of the workspace and reallocate
+      lwork = (int)work_query;
+      double* work = (double*)malloc( lwork*sizeof(double) );
+      
+      // Call to dgesvd_
+      dgesdd_( "N", &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, iwork, &info );
+
+      /* Check for convergence */
+      if( info > 0 ) {
+          printf( "The algorithm computing SVD failed to converge.\n" );
+          exit( 1 );
+      }
+
+      // Output 
+      // is the length n or m???????
+      for(int i=0; i<n; i++){ EigenVals.push_back(s[i]*s[i]);} // cout << s[i] << endl;}
+    
+      // Free all
+      free( (void*)work );
+      delete[] s;
 
 };
 
