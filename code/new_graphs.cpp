@@ -5,9 +5,9 @@ using namespace std;
 
 int main(){
 
-    unsigned maxOrder(10);
+    unsigned maxOrder(16);
     unsigned ID(0);
-    bool corner(false);
+    bool corner(true);
     //bool corner(true);
 
     vector< pair<int, int> > idList;
