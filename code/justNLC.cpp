@@ -181,9 +181,12 @@ int main(int argc, char** argv){
     WCorner = RenyiCorner;
     int subGraph;
 
+    int graph;
     //------------ Loop through the graphs and subgraphs
-    for (int graph=0; graph<numLines; graph++){
-        
+    for (int meas=0; meas<numLines; meas++){
+        cout << "Measurement " << meas << endl; 
+        graph = GraphMap[Identifier[meas]];
+
         for (int sub = 0; sub < fileGraphs.at(graph).SubgraphList.size(); sub++){
             WEnergy[graph] -= fileGraphs.at(graph).SubgraphList[sub].second * WEnergy[GraphMap[fileGraphs.at(graph).SubgraphList[sub].first]];
 
@@ -204,7 +207,7 @@ int main(int argc, char** argv){
     int maxSize(0);
     int maxOrder(0);
     for(int i=0; i<numLines; i++){ if(Nsites[i]>maxOrder){maxOrder=Nsites[i];} }
-    maxSize = maxOrder-1;
+    maxSize = maxOrder+1;
 
     vector<double> NLCEnergy;
     vector< vector< pair<double, double> > > NLCLine, NLCCorner;
@@ -213,24 +216,24 @@ int main(int argc, char** argv){
     NLCLine.resize(maxSize);
     NLCCorner.resize(maxSize);
 
-    int entry;
     for (int order=2; order<=maxOrder; order++){
-        entry = order-2;
-        NLCLine[entry].resize(Alphas);
-        NLCCorner[entry].resize(Alphas);
+        NLCLine[order].resize(Alphas);
+        NLCCorner[order].resize(Alphas);
 
         // change this part to not start at graph 0 //
-        for(int graph=0; graph<Energy.size(); graph++){
+        for(int meas=0; meas<Energy.size(); meas++){
+            graph = GraphMap[Identifier[meas]];
+
             if(Nsites[graph]<=order){ 
-                NLCEnergy[entry] += WEnergy[graph]*fileGraphs.at(graph).LatticeConstant;
+                NLCEnergy[order] += WEnergy[graph]*fileGraphs.at(graph).LatticeConstant;
                 for(int a=0; a<Alphas; a++){
-                    NLCLine[entry][a].second += WLine[graph][a].second * fileGraphs.at(graph).LatticeConstant;
-                    NLCCorner[entry][a].second += WCorner[graph][a].second * fileGraphs.at(graph).LatticeConstant;
+                    NLCLine[order][a].second += WLine[graph][a].second * fileGraphs.at(graph).LatticeConstant;
+                    NLCCorner[order][a].second += WCorner[graph][a].second * fileGraphs.at(graph).LatticeConstant;
                 }
             }
         }
     }
-      
+  
   //----------------------------------------------------------
   // Output results
   //----------------------------------------------------------
@@ -243,17 +246,17 @@ int main(int argc, char** argv){
     cout << endl;
 
     for(int o=2; o<=maxOrder; o++){
-      cout <<"Order " <<setw(3)<< o << " Jp " << setw(5) << Jperp[1] << " Energy " << setw(17) << NLCEnergy[o-2]
+      cout <<"Order " <<setw(3)<< o << " Jp " << setw(5) << Jperp[1] << " Energy " << setw(17) << NLCEnergy[o]
 	   <<" LineEntropies ";
 
       for(int a=0; a<Alphas; a++){
-	cout << setw (5) << RenyiLine[o-2][a].first << setw(17) <<  NLCLine[o-2][a].second ;
+	cout << setw (5) << RenyiLine[0][a].first << setw(17) <<  NLCLine[o][a].second ;
       }
       
       cout << " CornerEntropies ";
 	
       for(int a=0; a<Alphas; a++){
-	cout << setw (5) << RenyiCorner[o-2][a].first << setw(17) <<  NLCCorner[o-2][a].second ;
+	cout << setw (5) << RenyiCorner[0][a].first << setw(17) <<  NLCCorner[o][a].second ;
       }
       cout << endl;
     }
