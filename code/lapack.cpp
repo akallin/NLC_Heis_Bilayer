@@ -119,8 +119,8 @@ void svdWithLapack_simple(double *a, vector<double>& EigenVals, int &rows_, int 
       
       // Get sizes of the workspace and reallocate
       lwork = (int)work_query;
-      double* work = (double*)malloc( lwork*sizeof(double) );
-      
+      double *work= new double [lwork];
+ 
       // Call to dgesvd_
       info_ = dgesvd_(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu,
               vt, &ldvt, work, &lwork, &info);
@@ -130,7 +130,7 @@ void svdWithLapack_simple(double *a, vector<double>& EigenVals, int &rows_, int 
       for(int i=0; i<n; i++){ EigenVals.push_back(s[i]*s[i]);} // cout << s[i] << endl;}
     
       // Free all
-      free( (void*)work );
+      delete[] work;
       delete[] s;
 
 };
@@ -141,8 +141,7 @@ void svdWithLapack_simple(double *a, vector<double>& EigenVals, int &rows_, int 
 
 void svdWithLapack_divide(double *a,  vector<double>& EigenVals, int &rows_, int &cols_)
 {
-      char jobu='N';
-      char jobvt='N';
+      char jobz='N';
       int m=rows_;
       int n=cols_;
       int lda=rows_;
@@ -163,19 +162,19 @@ void svdWithLapack_divide(double *a,  vector<double>& EigenVals, int &rows_, int
       double *vt; int ldvt=n;
    
       // Workspace query
-     dgesdd_("N", &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, &work_query, &lwork, iwork, &info);
+     dgesdd_(&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, &work_query, &lwork, iwork, &info);
       
       // Get sizes of the workspace and reallocate
       lwork = (int)work_query;
-      double* work = (double*)malloc( lwork*sizeof(double) );
+      double *work= new double [lwork];
+
       
       // Call to dgesvd_
-      dgesdd_( "N", &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, iwork, &info );
+      dgesdd_(&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, iwork, &info );
 
       /* Check for convergence */
       if( info > 0 ) {
           printf( "The algorithm computing SVD failed to converge.\n" );
-          exit( 1 );
       }
 
       // Output 
@@ -183,7 +182,7 @@ void svdWithLapack_divide(double *a,  vector<double>& EigenVals, int &rows_, int
       for(int i=0; i<n; i++){ EigenVals.push_back(s[i]*s[i]);} // cout << s[i] << endl;}
     
       // Free all
-      free( (void*)work );
+      delete[] work ;
       delete[] s;
 
 };
