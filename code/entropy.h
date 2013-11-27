@@ -480,8 +480,8 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts,
     int dimB = Bdim_;
 
     // If I switch the rows and columns then switch dimB/dimA
-    //svdWithLapack_simple(SuperMat,dd,dimB,dimA);
-    svdWithLapack_divide(SuperMat,dd,dimB,dimA);
+    svdWithLapack_simple(SuperMat,dd,dimB,dimA);
+    //svdWithLapack_divide(SuperMat,dd,dimB,dimA);
     cout << currentDateTime() << " SVD complete " << endl;
 
     double EE(0);
