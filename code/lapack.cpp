@@ -87,8 +87,6 @@ void diagWithLapack_R(double *a, vector<double>& EigenVals, int &rows_, int &col
 };
 /*****************************************************************************/
 ///
-/// Function to take a real my_Matrix  and diag it with lapack
-///
 
 void svdWithLapack_simple(double *a, vector<double>& EigenVals, int &rows_, int &cols_)
 {
@@ -119,7 +117,9 @@ void svdWithLapack_simple(double *a, vector<double>& EigenVals, int &rows_, int 
       
       // Get sizes of the workspace and reallocate
       lwork = (int)work_query;
-      double *work= new double [lwork];
+      lwork *= 2; // try to use way more memory!!!
+
+	double *work= new double [lwork];
  
       // Call to dgesvd_
       info_ = dgesvd_(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu,
@@ -135,9 +135,6 @@ void svdWithLapack_simple(double *a, vector<double>& EigenVals, int &rows_, int 
 
 };
 /*****************************************************************************/
-///
-/// Function to take a real my_Matrix  and diag it with lapack
-///
 
 void svdWithLapack_divide(double *a,  vector<double>& EigenVals, int &rows_, int &cols_)
 {
