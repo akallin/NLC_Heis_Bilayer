@@ -566,12 +566,13 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, Eigen::Matr
 */
     double EE(0);
     double renyi(0); 
-    VectorXd logdd = dd.array().abs().log().matrix(); 
+    VectorXd tempdd = dd.array().abs().matrix(); 
+    VectorXd logdd = tempdd.array().log().matrix(); 
     VectorXd renyipow;
     double vN;     
     int temp=0;
 
-    vN = - (dd.dot(logdd));
+    vN = - (tempdd.dot(logdd));
     
     cout << currentDateTime() << " calculating renyis " << endl;
     for(int a=0; a<alpha2.size(); a++){
@@ -580,7 +581,7 @@ void getEE(vector <double> & alpha2, vector<double > & CornLineEnts, Eigen::Matr
         temp=0;
 
 
-        renyipow = dd.array().pow(alpha2[a]).matrix();
+        renyipow = tempdd.array().pow(alpha2[a]).matrix();
         renyi = renyipow.sum();
         // Loop over the eigenvalues
         /*
